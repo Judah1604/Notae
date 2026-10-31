@@ -39,22 +39,19 @@ body {
 				position: absolute;
 				transform: translate(-50%, -50%);
 
-				.marker {
-					cursor: pointer;
-					background-color: rgb(94, 94, 255);
-					width: 10px;
-					height: 10px;
-					border-radius: 100px;
-				}
-
 				.comment-card {
 					position: absolute;
 					left: 0;
 					bottom: 20px;
 					display: none;
-					background-color: rgb(94, 94, 255);
 					padding: 10px 15px;
-                    border-radius: 10px;
+					border-radius: 10px;
+					width: 200px;
+					min-width: 200px;
+					max-width: 250px;
+					overflow-wrap: break-word;
+					white-space: normal;
+					box-sizing: border-box;
 				}
 
 				&:hover .comment-card {
@@ -123,5 +120,31 @@ body {
 				}
 			}
 		}
+	}
+}
+
+.marker {
+	overflow: visible;
+	cursor: pointer;
+	transition: transform 180ms ease;
+}
+
+.marker:hover {
+	transform: scale(1.2);
+}
+
+.draw path {
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	animation: draw-marker 500ms ease forwards;
+}
+
+.draw .stroke-two {
+	animation-delay: 180ms;
+}
+
+@keyframes draw-marker {
+	to {
+		stroke-dashoffset: 0;
 	}
 }

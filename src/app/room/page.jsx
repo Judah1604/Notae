@@ -1,15 +1,18 @@
 "use client";
 import { useState } from "react";
 import "../styles/room.css";
+import XMarker from "./components/XMarker";
+import ScribbleMarker from "./components/ScribbleMarker";
 
 export default function page() {
 	const [pins, setPins] = useState([]);
 	const [commentActive, setCommentActive] = useState(false);
 	const [comment, setComment] = useState("");
 	const [targetId, setTargetId] = useState(0);
+	const color = "#5e5eff";
 
 	function handleImageClick(e) {
-        const MIN_DISTANCE = 0.04;
+		const MIN_DISTANCE = 0.04;
 		const rect = e.currentTarget.getBoundingClientRect();
 		const id = crypto.randomUUID();
 
@@ -23,9 +26,11 @@ export default function page() {
 			return Math.sqrt(dx * dx + dy * dy) < MIN_DISTANCE;
 		});
 
+		const markerType = Math.random() < 0.5 ? "x" : "scribble";
+
 		if (!tooClose && targetId === 0) {
 			setTargetId(id);
-			setPins((prev) => [...prev, { id, x, y }]);
+			setPins((prev) => [...prev, { id, x, y, markerType }]);
 			setCommentActive(true);
 		}
 	}
@@ -66,9 +71,24 @@ export default function page() {
 								top: `${pin.y * 100}%`,
 							}}
 						>
-                            <div className="marker"></div>
-                            <div className="comment-card">{pin.comment}</div>
-                        </div>
+							{pin.markerType === "x" ? (
+								<XMarker color={color} />
+							) : (
+								<ScribbleMarker color={color} />
+							)}
+							<div
+								className={
+									!pin.comment
+										? "comment-card d-none"
+										: "comment-card"
+								}
+								style={{
+									backgroundColor: color,
+								}}
+							>
+								{pin.comment}
+							</div>
+						</div>
 					))}
 				</div>
 			</div>
