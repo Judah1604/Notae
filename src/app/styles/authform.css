@@ -52,19 +52,24 @@
 				background-color: #e8e6e6;
 				color: #262626;
 			}
+
+			&:active {
+				background-color: white !important;
+				color: #262626 !important;
+			}
 		}
 
-        .extra {
-            color: #515151;
+		.extra {
+			color: #515151;
 
-            a {
-                color: white;
+			a {
+				color: white;
 
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-        }
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
 
 		h1 {
 			font-weight: 600;
