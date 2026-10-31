@@ -52,6 +52,11 @@ body {
 					overflow-wrap: break-word;
 					white-space: normal;
 					box-sizing: border-box;
+
+					.username {
+						font-size: 0.8em;
+						opacity: 0.5;
+					}
 				}
 
 				&:hover .comment-card {

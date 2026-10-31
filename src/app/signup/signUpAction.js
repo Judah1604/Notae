@@ -1,10 +1,17 @@
+'use server'
 import { supabase } from "@/lib/supabase/supabase";
-import { redirect } from "next/dist/server/api-utils";
+import { redirect } from "next/navigation";
 
 export const signupAction = async (formData) => {
+    
 	const { data, error } = await supabase.auth.signUp({
-		email: "tejsns3@gmail.com",
-		password: "testpass123",
+		email: formData.email,
+		password: formData.password,
+		options: {
+			data: {
+				display_name: formData.username,
+			},
+		},
 	});
 
 	if (error) {
@@ -13,6 +20,6 @@ export const signupAction = async (formData) => {
 	}
 
 	if (data.session) {
-		redirect('/')
+		redirect("/");
 	}
 };

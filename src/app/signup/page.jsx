@@ -4,7 +4,11 @@ import "../styles/authform.css";
 import { signupAction } from "./signUpAction";
 
 function page() {
-	const [formData, setFormData] = useState({ email: "", password: "" });
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+	});
 
 	const handleChange = (e) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,10 +23,26 @@ function page() {
 		<div className="wrapper">
 			<form onSubmit={handleSubmit}>
 				<div className="header">
-					<h1>Let's get you signed up</h1>
-					<p>Sign up</p>
+					<h1>Your ideas deserve a second pair of eyes.</h1>
+					<p>
+						Create an account to start sharing designs, exchanging
+						feedback, and collaborating with others.
+					</p>
 				</div>
 
+				<div className="form-group">
+					<label htmlFor="name">Display name</label>
+					<input
+						type="text"
+						id="name"
+						name="username"
+						className="form-control"
+						placeholder="Enter your display name"
+						value={formData.username}
+						onChange={(e) => handleChange(e)}
+						required
+					/>
+				</div>
 				<div className="form-group">
 					<label htmlFor="email">Email</label>
 					<input
@@ -50,8 +70,11 @@ function page() {
 					/>
 				</div>
 				<button type="submit" className="btn btn-primary">
-					Sign up
+					Create Account
 				</button>
+				<div className="extra">
+					Already have an account? <a href="/login">Log in</a>
+				</div>
 			</form>
 		</div>
 	);

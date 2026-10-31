@@ -9,7 +9,12 @@ export default function page() {
 	const [commentActive, setCommentActive] = useState(false);
 	const [comment, setComment] = useState("");
 	const [targetId, setTargetId] = useState(0);
-	const color = "#5e5eff";
+	const users = [
+		{ id: "user-1", name: "Judah", color: "#E05252" },
+		{ id: "user-2", name: "Alex", color: "#3977D5" },
+		{ id: "user-3", name: "Sam", color: "#27A879" },
+	];
+	const [currentUser, setCurrentUser] = useState(users[2]);
 
 	function handleImageClick(e) {
 		const MIN_DISTANCE = 0.04;
@@ -30,7 +35,10 @@ export default function page() {
 
 		if (!tooClose && targetId === 0) {
 			setTargetId(id);
-			setPins((prev) => [...prev, { id, x, y, markerType }]);
+			setPins((prev) => [
+				...prev,
+				{ id, x, y, markerType, authorId: currentUser.id },
+			]);
 			setCommentActive(true);
 		}
 	}
@@ -72,9 +80,9 @@ export default function page() {
 							}}
 						>
 							{pin.markerType === "x" ? (
-								<XMarker color={color} />
+								<XMarker color={currentUser.color} />
 							) : (
-								<ScribbleMarker color={color} />
+								<ScribbleMarker color={currentUser.color} />
 							)}
 							<div
 								className={
@@ -83,10 +91,13 @@ export default function page() {
 										: "comment-card"
 								}
 								style={{
-									backgroundColor: color,
+									backgroundColor: currentUser.color,
 								}}
 							>
 								{pin.comment}
+								<div className="username">
+									{currentUser.name}
+								</div>
 							</div>
 						</div>
 					))}

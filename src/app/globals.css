@@ -44,9 +44,12 @@ a {
 .header {
 	h1 {
 		font-size: 2.6em;
+		margin-bottom: 3px;
 	}
 	p {
-		opacity: 0.6;
+		opacity: 0.3;
+		font-weight: 200;
+		margin: 0;
 	}
 }
 
@@ -54,6 +57,7 @@ h1,
 h2,
 h3 {
 	letter-spacing: -1px;
+	font-family: var(--font-inter);
 }
 
 input,
@@ -62,9 +66,9 @@ textarea {
 		box-shadow: none !important;
 	}
 
-    &::placeholder {
-        color: #323232 !important;
-    }
+	&::placeholder {
+		color: #323232 !important;
+	}
 }
 
 @media (prefers-color-scheme: dark) {
