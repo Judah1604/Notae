@@ -23,7 +23,9 @@ function page() {
 		<div className="wrapper">
 			<form onSubmit={handleSubmit}>
 				<div className="header">
-					<h1>Your ideas deserve a second pair of eyes.</h1>
+					<h1>
+						Welcome to <span>notae</span>.
+					</h1>
 					<p>
 						Create an account to start sharing designs, exchanging
 						feedback, and collaborating with others.

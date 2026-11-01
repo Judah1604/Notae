@@ -4,18 +4,41 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+    background: url(/authform-bg.png);
+    background-size: cover;
+    background-position: center;
 
 	form {
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		width: 650px;
+		width: 700px;
 		padding: 30px;
 		border-radius: 20px;
 		display: flex;
 		flex-direction: column;
 		gap: 15px;
+        background-color: var(--background);
+
+        .header {
+            text-align: center;
+
+            span {
+                font-family: var(--font-eb_garamond);
+                font-weight: 200;
+                font-size: 1.3em;
+            }
+
+            img {
+                height: 40px;
+            }
+
+            p {
+                width: 90%;
+                margin: auto;
+            }
+        }
 
 		h1 {
-			font-size: 2.3em;
+			font-size: 2.6em;
+            margin-bottom: -3px;
 		}
 
 		.form-group {

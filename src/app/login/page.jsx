@@ -22,10 +22,12 @@ function page() {
 		<div className="wrapper">
 			<form onSubmit={handleSubmit}>
 				<div className="header">
-					<h1>Welcome back.</h1>
+					<h1>
+						Welcome to <span>notae</span>.
+					</h1>{" "}
 					<p>
-						Good to have you here. Pick up where you left off, share
-						your thoughts, and keep making better things together.
+						Pick up where you left off, share your thoughts, and
+						keep making better things together.
 					</p>
 				</div>
 
@@ -59,7 +61,7 @@ function page() {
 					Continue to your account
 				</button>
 				<div className="extra">
-                Don't have an account yet? <a href="/signup">Create one</a>
+					Don't have an account yet? <a href="/signup">Create one</a>
 				</div>
 			</form>
 		</div>
