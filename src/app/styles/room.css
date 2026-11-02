@@ -5,6 +5,56 @@ body {
 }
 
 .wrapper {
+	.top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 15px;
+
+		.back {
+			a {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				opacity: 0.3;
+				transition: 0.3s ease;
+				&:hover {
+					opacity: 1;
+				}
+			}
+
+			img {
+				width: 20px;
+				height: 20px;
+				cursor: pointer;
+			}
+		}
+
+		.title {
+			font-weight: 600;
+		}
+
+		.members {
+			display: flex;
+			cursor: pointer;
+			.marker {
+				width: 25px;
+				height: 25px;
+				border-radius: 100%;
+				margin-left: -7px;
+				border-left: 2px solid #121212;
+
+                &:first-child {
+                    border-left: none;
+                }
+			}
+
+			.count {
+				margin-left: 5px;
+			}
+		}
+	}
+
 	.file-input {
 		padding: 30px;
 		display: flex;
@@ -17,6 +67,15 @@ body {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		.marker {
+			overflow: visible;
+			cursor: pointer;
+			transition: transform 180ms ease;
+		}
+
+		.marker:hover {
+			transform: scale(1.2);
+		}
 
 		.image-wrapper {
 			width: 500px;
@@ -56,6 +115,35 @@ body {
 
 				&:hover .comment-card {
 					display: block;
+				}
+
+				.deletepin {
+					color: #ff383c;
+					background-color: #121212;
+					border-radius: 10px;
+					align-items: center;
+					gap: 5px;
+					padding: 10px 15px;
+					display: none;
+					position: absolute;
+					top: 100%;
+					left: 50%;
+					transform: translate(-50%, 10px);
+					width: max-content;
+                    transition: 0.3s ease;
+
+					img {
+						width: 20px;
+						height: 20px;
+					}
+
+					&.active {
+						display: flex;
+					}
+
+                    &:hover {
+                        color: #fe696c;
+                    }
 				}
 			}
 		}
@@ -102,7 +190,7 @@ body {
 		}
 
 		img {
-			padding: 15px;
+			padding: 9px;
 			border-radius: 100%;
 			display: flex;
 			transition: 0.2s ease;
@@ -125,16 +213,6 @@ body {
 			}
 		}
 	}
-}
-
-.marker {
-	overflow: visible;
-	cursor: pointer;
-	transition: transform 180ms ease;
-}
-
-.marker:hover {
-	transform: scale(1.2);
 }
 
 .draw path {

@@ -20,6 +20,6 @@ export const signupAction = async (formData) => {
 	}
 
 	if (data.session) {
-		redirect("/");
+		redirect("/home");
 	}
 };

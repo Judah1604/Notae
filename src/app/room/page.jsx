@@ -15,6 +15,19 @@ export default function page() {
 		{ id: "user-3", name: "Sam", color: "#27A879" },
 	];
 	const [currentUser, setCurrentUser] = useState(users[2]);
+	const [activeDeleteId, setActiveDeleteId] = useState(null);
+
+	function getContrastColor(hex) {
+		const cleanHex = hex.replace("#", "");
+
+		const r = parseInt(cleanHex.slice(0, 2), 16);
+		const g = parseInt(cleanHex.slice(2, 4), 16);
+		const b = parseInt(cleanHex.slice(4, 6), 16);
+
+		const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+		return brightness > 128 ? "#000000" : "#FFFFFF";
+	}
 
 	function handleImageClick(e) {
 		const MIN_DISTANCE = 0.04;
@@ -33,7 +46,7 @@ export default function page() {
 
 		const markerType = Math.random() < 0.5 ? "x" : "scribble";
 
-		if (!tooClose && targetId === 0) {
+		if (!tooClose && targetId === 0 && !activeDeleteId) {
 			setTargetId(id);
 			setPins((prev) => [
 				...prev,
@@ -42,6 +55,12 @@ export default function page() {
 			setCommentActive(true);
 		}
 	}
+
+	const deletePin = (id) => {
+		setPins((prev) => prev.filter((pin) => pin.id !== id));
+		setActiveDeleteId(null);
+		setCommentActive(false);
+	};
 
 	const handleSubmit = () => {
 		if (comment !== "") {
@@ -67,6 +86,24 @@ export default function page() {
 
 	return (
 		<div className="wrapper">
+			<div className="top">
+				<div className="back">
+					<a href="/home">
+						<img src="/icons/chevron-left.svg" alt="" /> Back
+					</a>
+				</div>
+				<div className="title">Janus Room</div>
+				<div className="members">
+					{users.map((user) => (
+						<div
+							key={user.id}
+							className="marker"
+							style={{ backgroundColor: user.color }}
+						></div>
+					))}
+					<div className="count">+3</div>
+				</div>
+			</div>
 			<div className="preview">
 				<div className="image-wrapper" onClick={handleImageClick}>
 					<img src="/reach.png" alt="File Preview" />
@@ -80,9 +117,15 @@ export default function page() {
 							}}
 						>
 							{pin.markerType === "x" ? (
-								<XMarker color={currentUser.color} />
+								<XMarker
+									color={currentUser.color}
+									onClick={() => setActiveDeleteId(pin.id)}
+								/>
 							) : (
-								<ScribbleMarker color={currentUser.color} />
+								<ScribbleMarker
+									color={currentUser.color}
+									onClick={() => setActiveDeleteId(pin.id)}
+								/>
 							)}
 							<div
 								className={
@@ -92,12 +135,31 @@ export default function page() {
 								}
 								style={{
 									backgroundColor: currentUser.color,
+									color: getContrastColor(currentUser.color),
 								}}
 							>
 								{pin.comment}
-								<div className="username">
+								<div
+									className="username"
+									style={{
+										color: getContrastColor(
+											currentUser.color,
+										),
+									}}
+								>
 									{currentUser.name}
 								</div>
+							</div>
+							<div
+								className={
+									activeDeleteId === pin.id
+										? "deletepin active"
+										: "deletepin"
+								}
+								onClick={() => deletePin(pin.id)}
+							>
+								<img src="/icons/trash-2.svg" alt="" />
+								Delete Pin
 							</div>
 						</div>
 					))}
@@ -114,6 +176,11 @@ export default function page() {
 					placeholder="Enter your comment"
 					value={comment}
 					onChange={(e) => setComment(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							handleSubmit();
+						}
+					}}
 				/>
 				<div className="btns">
 					<img

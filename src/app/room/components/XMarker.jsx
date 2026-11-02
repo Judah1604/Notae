@@ -1,4 +1,4 @@
-export default function XMarker({ color, animate = true }) {
+export default function XMarker({ color, animate = true, onClick }) {
 	return (
 		<svg
 			className={`marker ${animate ? "draw" : ""}`}
@@ -6,6 +6,7 @@ export default function XMarker({ color, animate = true }) {
 			width="32"
 			height="32"
 			xmlns="http://www.w3.org/2000/svg"
+			onClick={onClick}
 		>
 			<path
 				d="M10 10 L30 30"

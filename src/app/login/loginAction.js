@@ -11,9 +11,14 @@ export const loginAction = async (formData) => {
 		password: formData.password,
 	});
 
+	// console.log("Login data:", data);
+	// console.log("Login error:", error);
+
 	if (error) {
 		return { error: error.message };
 	}
 
-	redirect("/");
+	if (data.session) {
+		redirect("/home");
+	}
 };

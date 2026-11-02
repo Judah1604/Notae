@@ -17,9 +17,7 @@ export const createClient = async () => {
 						cookiesToSet.forEach(({ name, value, options }) =>
 							cookieStore.set(name, value, options),
 						);
-					} catch {
-						// Cookie writes may be unavailable in Server Components.
-					}
+					} catch {}
 				},
 			},
 		},

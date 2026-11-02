@@ -1,0 +1,90 @@
+body {
+	background-color: #121212;
+}
+
+.topbar {
+	background-color: var(--background);
+	padding: 15px 20px;
+
+	.title {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		img {
+			height: 30px;
+		}
+
+		.account {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-right: 10px;
+
+			.marker {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+			}
+		}
+	}
+
+	.menu {
+		margin-top: 15px;
+		display: flex;
+		justify-content: start;
+		gap: 20px;
+
+		a {
+			opacity: 0.3;
+			transition: 0.2s ease-in-out;
+
+			&:hover,
+			&.active {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.rooms {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 30px;
+
+	.room {
+        position: relative;
+		.display {
+			width: 100%;
+			height: auto;
+			object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+		}
+
+        .visitor-count {
+            padding: 10px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #121212d8;
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deletebtn img {
+            width: 20px;
+            cursor: pointer;
+        }
+	}
+}
