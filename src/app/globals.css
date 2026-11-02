@@ -70,6 +70,24 @@ textarea {
 	}
 }
 
+button, a.btn {
+	background-color: white !important;
+	color: #262626 !important;
+	padding: 14px !important;
+	border: none;
+	border-radius: 15px !important;
+
+	&:hover {
+		background-color: #e8e6e6 !important;
+		color: #262626 !important;
+	}
+
+	&:active {
+		background-color: white !important;
+		color: #262626 !important;
+	}
+}
+
 @media (prefers-color-scheme: dark) {
 	html {
 		color-scheme: dark;

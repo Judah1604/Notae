@@ -1,17 +1,17 @@
 "use client";
-import { redirect, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import "../styles/dashboard.css";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 
+const supabase = createClient();
 function page() {
-	const supabase = createClient();
-	const [userData, setUserData] = useState({
-		display_name: "Loading...",
-		id: 0,
+	const [user, setUser] = useState({
+		id: null,
+		name: "Loading...",
+		color: "#000000",
 	});
-	const [profileColor, setProfileColor] = useState("#3977D5");
 	const pathname = usePathname();
 	const menuItems = [
 		{ name: "Home", path: "/home" },
@@ -21,7 +21,7 @@ function page() {
 	useEffect(() => {
 		async function getUserData() {
 			const {
-				data: { user },
+				data: { user: userData },
 				error,
 			} = await supabase.auth.getUser();
 
@@ -29,37 +29,40 @@ function page() {
 				console.error(error);
 			}
 
-			if (!user) {
-				redirect("/login");
+			if (!userData) {
+				router.replace("/login");
+				return;
 			}
 
-			setUserData((prev) => ({
+			// console.log("User data:", userData);
+
+			setUser((prev) => ({
 				...prev,
-				display_name: user.user_metadata.display_name,
-				id: user.id,
+				name: userData.user_metadata.display_name,
+				id: userData.id,
 			}));
-		}
-		async function getProfile() {
-			const { data: profile, error } = await supabase
+
+			const { data: profile, error: profileError } = await supabase
 				.from("profiles")
 				.select("*")
-				.eq("id", user.id)
-				.single();
+				.eq("id", userData.id)
+                .single();
 
-			if (error) {
-				console.error(error);
+			if (profileError) {
+				console.error(profileError);
 			}
 
-			if (profile) {
-				setProfileColor(profile.color);
-			}
+
+			setUser((prev) => ({
+				...prev,
+				color: profile?.color || "#000000",
+			}));
 		}
 		async function load() {
 			await getUserData();
-			await getProfile();
 		}
 
-		load();
+		// load();
 	}, []);
 
 	return (
@@ -70,12 +73,14 @@ function page() {
 					<div className="account">
 						<div
 							className="marker"
-							style={{ backgroundColor: profileColor }}
+							style={{ backgroundColor: user.color }}
 						></div>
-						<div className="name">{userData?.display_name}</div>
+						<div className="name">{user.name}</div>
 					</div>
 				</div>
 				<div className="menu">
+                    <div className="links">
+
 					{menuItems.map((item) => (
 						<a
 							key={item.path}
@@ -87,6 +92,10 @@ function page() {
 							{item.name}
 						</a>
 					))}
+                    </div>
+                    <a href="/create-room" className="btn">
+                        <img src="/icons/plus.svg" alt="" />
+                        Create new Room</a>
 				</div>
 			</div>
 

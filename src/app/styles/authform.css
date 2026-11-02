@@ -64,24 +64,6 @@
 			}
 		}
 
-		button {
-			background-color: white;
-			color: #262626;
-			padding: 14px;
-			border: none;
-			border-radius: 15px;
-
-			&:hover {
-				background-color: #e8e6e6;
-				color: #262626;
-			}
-
-			&:active {
-				background-color: white !important;
-				color: #262626 !important;
-			}
-		}
-
 		.extra {
 			color: #515151;
 
