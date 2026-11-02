@@ -1,9 +1,9 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import "../styles/dashboard.css";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import "../styles/dashboard.css";
 
 const supabase = createClient();
 function page() {
@@ -13,6 +13,7 @@ function page() {
 		color: "#000000",
 	});
 	const pathname = usePathname();
+	const router = useRouter();
 	const menuItems = [
 		{ name: "Home", path: "/home" },
 		{ name: "Profile", path: "/profile" },
@@ -34,7 +35,7 @@ function page() {
 				return;
 			}
 
-			// console.log("User data:", userData);
+			console.log("User data:", userData);
 
 			setUser((prev) => ({
 				...prev,
@@ -46,12 +47,11 @@ function page() {
 				.from("profiles")
 				.select("*")
 				.eq("id", userData.id)
-                .single();
+				.single();
 
 			if (profileError) {
 				console.error(profileError);
 			}
-
 
 			setUser((prev) => ({
 				...prev,
@@ -62,7 +62,7 @@ function page() {
 			await getUserData();
 		}
 
-		// load();
+		load();
 	}, []);
 
 	return (
@@ -79,23 +79,23 @@ function page() {
 					</div>
 				</div>
 				<div className="menu">
-                    <div className="links">
-
-					{menuItems.map((item) => (
-						<a
-							key={item.path}
-							href={item.path}
-							className={
-								pathname.includes(item.path) ? "active" : ""
-							}
-						>
-							{item.name}
-						</a>
-					))}
-                    </div>
-                    <a href="/create-room" className="btn">
-                        <img src="/icons/plus.svg" alt="" />
-                        Create new Room</a>
+					<div className="links">
+						{menuItems.map((item) => (
+							<a
+								key={item.path}
+								href={item.path}
+								className={
+									pathname.includes(item.path) ? "active" : ""
+								}
+							>
+								{item.name}
+							</a>
+						))}
+					</div>
+					<a href="/create-room" className="btn">
+						<img src="/icons/plus.svg" alt="" />
+						Create new Room
+					</a>
 				</div>
 			</div>
 

@@ -32,18 +32,18 @@ body {
 	.menu {
 		display: flex;
 		justify-content: space-between;
-        align-items: center;
-        margin-top: 15px;
+		align-items: center;
+		margin-top: 15px;
 
-        a.btn {
-            padding: 10px 15px !important;
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
+		a.btn {
+			padding: 10px 15px !important;
+			display: flex;
+			align-items: center;
+			gap: 9px;
+		}
 
 		.links {
-            display: flex;
+			display: flex;
 			justify-content: start;
 			gap: 20px;
 
@@ -100,4 +100,67 @@ body {
 			cursor: pointer;
 		}
 	}
+}
+
+.create_room {
+	.wrapper {
+		margin-top: 10px;
+		display: grid;
+		grid-template-columns: 2fr 3fr;
+		gap: 30px;
+	}
+
+	.img-upload {
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.no-image {
+			text-align: center;
+			opacity: 0.3;
+			margin-top: 10px;
+		}
+		.img-preview {
+			width: 100%;
+			height: auto;
+			object-fit: cover;
+			border-radius: 10px;
+			margin-top: 10px;
+		}
+	}
+
+	input {
+		background-color: #262626;
+		border: none;
+		outline: none;
+		padding: 15px 20px;
+		border-radius: 10px;
+		color: white !important;
+
+		&::placeholder {
+			color: #898989 !important;
+		}
+
+		&:focus {
+			background-color: #262626;
+		}
+	}
+
+    .text {
+        text-align: right;
+
+        .form-group {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 7px !important;
+        }
+        button {
+            margin-top: 15px;
+            padding: 15px 25px !important;
+            border-radius: 10px !important;
+        }
+    }
 }

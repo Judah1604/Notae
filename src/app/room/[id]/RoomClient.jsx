@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
-import "../styles/room.css";
-import XMarker from "./components/XMarker";
-import ScribbleMarker from "./components/ScribbleMarker";
+import "../../styles/room.css";
+import XMarker from "../components/XMarker";
+import ScribbleMarker from "../components/ScribbleMarker";
+import { useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-export default function page() {
+const supabase = createClient();
+export default function RoomClient({ room_id }) {
 	const [pins, setPins] = useState([]);
 	const [commentActive, setCommentActive] = useState(false);
 	const [comment, setComment] = useState("");
@@ -16,6 +19,44 @@ export default function page() {
 	];
 	const [currentUser, setCurrentUser] = useState(users[2]);
 	const [activeDeleteId, setActiveDeleteId] = useState(null);
+	const [imageUrl, setImageUrl] = useState(null);
+    const [room, setRoom] = useState(null);
+
+	useEffect(() => {
+		async function fetchRoomImage() {
+			// console.log(room_id);
+			const { data: room, error: roomError } = await supabase
+				.from("rooms")
+				.select("*")
+				.eq("id", room_id)
+				.single();
+
+			if (roomError) {
+				console.error("Room fetch failed:", roomError);
+				return;
+			}
+
+			if (!room.image_path) {
+				console.error("This room has no image path.");
+				return;
+			}
+
+            setRoom(room);
+
+			const { data, error } = await supabase.storage
+				.from("designs")
+				.createSignedUrl(room.image_path, 3600);
+
+			if (error) {
+				console.error("Signed URL generation failed:", error);
+				return;
+			}
+
+			setImageUrl(data.signedUrl);
+		}
+
+		fetchRoomImage();
+	}, [room_id]);
 
 	function getContrastColor(hex) {
 		const cleanHex = hex.replace("#", "");
@@ -92,7 +133,7 @@ export default function page() {
 						<img src="/icons/chevron-left.svg" alt="" /> Back
 					</a>
 				</div>
-				<div className="title">Janus Room</div>
+				<div className="title">{room?.name || "Loading..."}</div>
 				<div className="members">
 					{users.map((user) => (
 						<div
@@ -106,7 +147,7 @@ export default function page() {
 			</div>
 			<div className="preview">
 				<div className="image-wrapper" onClick={handleImageClick}>
-					<img src="/reach.png" alt="File Preview" />
+					<img src={imageUrl} alt="File Preview" />
 					{pins.map((pin, index) => (
 						<div
 							key={index}

@@ -9,6 +9,8 @@ CREATE TABLE rooms (
   id uuid PRIMARY KEY,
   name TEXT NOT NULL,
   created_by uuid NOT NULL REFERENCES auth.users(id),
+  image_path text,
+  image_uploaded_by uuid REFERENCES auth.users(id),
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 CREATE TABLE room_members (
