@@ -11,6 +11,7 @@ const supabase = createClient();
 function page() {
 	const router = useRouter();
 	const [rooms, setRooms] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 	const [user, setUser] = useState({
 		id: null,
 		name: "Loading...",
@@ -33,7 +34,7 @@ function page() {
 			.eq("room_id", room_id);
 
 		if (memError) console.error(memError);
-        console.log(roomMembers, room_id)
+		console.log(roomMembers, room_id);
 
 		return { imageUrl: data.signedUrl, membersLen: roomMembers.length };
 	};
@@ -101,10 +102,14 @@ function page() {
 		}
 
 		async function load() {
-			const userId = await getUserData();
+			try {
+				const userId = await getUserData();
 
-			if (userId) {
-				await loadRooms(userId);
+				if (userId) {
+					await loadRooms(userId);
+				}
+			} finally {
+				setIsLoading(false);
 			}
 		}
 
@@ -115,11 +120,13 @@ function page() {
 		<div className="home">
 			<Topbar user={user} />
 
-			<div className="rooms">
-				{rooms.length === 0 ? (
-					<p className="text-center">Loading your rooms...</p>
-				) : (
-					rooms.map((room) => (
+			{isLoading ? (
+				<p className="text-center mt-5">Loading your rooms...</p>
+			) : rooms.length === 0 ? (
+				<p className="text-center mt-5">You haven't made a room yet.</p>
+			) : (
+				<div className="rooms">
+					{rooms.map((room) => (
 						<div className="room" key={room.id}>
 							<a href="/room">
 								<img
@@ -129,7 +136,8 @@ function page() {
 								/>
 							</a>
 							<div className="visitor-count">
-								<img src="/icons/eye.svg" alt="" />{room.membersLen}
+								<img src="/icons/eye.svg" alt="" />
+								{room.membersLen}
 							</div>
 							<div className="info">
 								{room.name}
@@ -147,9 +155,9 @@ function page() {
 								</div>
 							</div>
 						</div>
-					))
-				)}
-			</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 }
