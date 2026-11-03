@@ -31,6 +31,7 @@ export default function RoomClient({ room_id }) {
 		comment: "",
 	};
 	const [activePin, setActivePin] = useState(defaultPin);
+	const [pinDetail, setPinDetail] = useState(null);
 	const displayPins = commentActive
 		? [
 				...pins,
@@ -77,6 +78,22 @@ export default function RoomClient({ room_id }) {
 					});
 				},
 			)
+			.on(
+				"postgres_changes",
+				{
+					event: "DELETE",
+					schema: "public",
+					table: "pins",
+				},
+				(payload) => {
+					const deletedPinId = payload.old.id;
+
+					setPins((prev) =>
+						prev.filter((pin) => pin.id !== deletedPinId),
+					);
+				},
+			)
+
 			.subscribe();
 
 		return () => {
@@ -226,6 +243,7 @@ export default function RoomClient({ room_id }) {
 	}, [room_id]);
 
 	function getContrastColor(hex) {
+		if (!hex) return;
 		const cleanHex = hex.replace("#", "");
 
 		const r = parseInt(cleanHex.slice(0, 2), 16);
@@ -239,7 +257,7 @@ export default function RoomClient({ room_id }) {
 
 	function findAuthor(pin) {
 		const author = roomInfo.members.find(
-			(member) => member.id === pin.authorId,
+			(member) => member.id === pin?.authorId,
 		);
 		return author;
 	}
@@ -272,10 +290,20 @@ export default function RoomClient({ room_id }) {
 		}
 	}
 
-	const deletePin = (id) => {
-		setPins((prev) => prev.filter((pin) => pin.id !== id));
+	const deletePin = async (pinId) => {
+		const { error } = await supabase
+			.from("pins")
+			.delete()
+			.eq("id", pinId)
+			.eq("room_id", room_id);
+
+		if (error) {
+			console.error("Error deleting pin:", error);
+			return;
+		}
+
+		setPins((prev) => prev.filter((pin) => pin.id !== pinId));
 		setActiveDeleteId(null);
-		setCommentActive(false);
 	};
 
 	const handleSubmit = async () => {
@@ -320,6 +348,11 @@ export default function RoomClient({ room_id }) {
 		setActivePin(defaultPin);
 		setComment("");
 		setCommentActive(false);
+	};
+
+	const showPinDetails = async (pin) => {
+		// console.log(pin);
+		setPinDetail(pin);
 	};
 
 	return (
@@ -398,6 +431,7 @@ export default function RoomClient({ room_id }) {
 														setActiveDeleteId(
 															pin.id,
 														);
+														showPinDetails(pin);
 													}}
 												/>
 											) : (
@@ -410,6 +444,7 @@ export default function RoomClient({ room_id }) {
 														setActiveDeleteId(
 															pin.id,
 														);
+														showPinDetails(pin);
 													}}
 												/>
 											)}
@@ -439,23 +474,6 @@ export default function RoomClient({ room_id }) {
 												>
 													{findAuthor(pin)?.name}
 												</div>
-											</div>
-											<div
-												className={
-													activeDeleteId === pin.id
-														? "deletepin active"
-														: "deletepin"
-												}
-												onClick={(e) => {
-													e.stopPropagation();
-													deletePin(pin.id);
-												}}
-											>
-												<img
-													src="/icons/trash-2.svg"
-													alt=""
-												/>
-												Delete Pin
 											</div>
 										</div>
 									))}
@@ -497,6 +515,65 @@ export default function RoomClient({ room_id }) {
 								alt="arrow-up"
 								className="submit"
 								onClick={handleSubmit}
+							/>
+						</div>
+					</div>
+					<div
+						className={
+							activeDeleteId
+								? "pin-details active"
+								: "pin-details"
+						}
+					>
+						<div className="title">
+							<div className="items">
+								<img
+									src="/icons/x.svg"
+									alt=""
+									className="close"
+									onClick={() => setActiveDeleteId(null)}
+								/>
+								<span>{findAuthor(pinDetail)?.name}'s Pin</span>
+							</div>
+							{pinDetail?.authorId === currentUser?.id && (
+								<img
+									src="/icons/trash-2.svg"
+									alt=""
+									onClick={() => deletePin(activeDeleteId)}
+								/>
+							)}
+						</div>
+						<div className="chat">
+							<div
+								className={"comment-card"}
+								style={{
+									backgroundColor:
+										findAuthor(pinDetail)?.color,
+									color: getContrastColor(
+										findAuthor(pinDetail)?.color,
+									),
+								}}
+							>
+								{pinDetail?.comment}
+								<div
+									className="username"
+									style={{
+										color: getContrastColor(
+											findAuthor(pinDetail)?.color,
+										),
+									}}
+								>
+									{findAuthor(pinDetail)?.name}
+								</div>
+							</div>
+						</div>
+						<div className="disclaimer">Enter to send</div>
+
+						<div className="input">
+							<input
+								type="text"
+								className="form-control"
+								placeholder="Enter your reply"
 							/>
 						</div>
 					</div>

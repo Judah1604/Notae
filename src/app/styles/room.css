@@ -103,8 +103,8 @@ body {
 		position: absolute;
 		bottom: 10px;
 		right: 10px;
-        font-size: 0.8em;
-        opacity: 0.3;
+		font-size: 0.8em;
+		opacity: 0.3;
 	}
 
 	.file-input {
@@ -174,35 +174,6 @@ body {
 				&:hover .comment-card {
 					display: block;
 				}
-
-				.deletepin {
-					color: #ff383c;
-					background-color: #121212;
-					border-radius: 10px;
-					align-items: center;
-					gap: 5px;
-					padding: 10px 15px;
-					display: none;
-					position: absolute;
-					top: 100%;
-					left: 50%;
-					transform: translate(-50%, 10px);
-					width: max-content;
-					transition: 0.3s ease;
-
-					img {
-						width: 20px;
-						height: 20px;
-					}
-
-					&.active {
-						display: flex;
-					}
-
-					&:hover {
-						color: #fe696c;
-					}
-				}
 			}
 		}
 	}
@@ -269,6 +240,90 @@ body {
 					background-color: #f95659;
 				}
 			}
+		}
+	}
+}
+
+.pin-details {
+	position: absolute;
+	top: 50%;
+	transform: translate(110%, -50%);
+	right: 20px;
+	padding: 20px;
+	background-color: #121212cc;
+	backdrop-filter: blur(8px);
+	border-radius: 15px;
+	border: 1px solid #181818;
+	transition: 0.2s ease;
+	display: flex;
+	flex-direction: column;
+	z-index: 1000;
+	gap: 10px;
+	width: 350px;
+    
+    &.active {
+        transform: translate(0%, -50%);
+    }
+
+	.chat {
+		height: 300px;
+	}
+
+    .disclaimer {
+        position: static;
+        text-align: right;
+    }
+
+	.input {
+		input {
+			background-color: #262626;
+			border: none;
+			outline: none;
+			padding: 15px 20px;
+			border-radius: 10px;
+			color: white !important;
+
+			&::placeholder {
+				color: #898989 !important;
+			}
+		}
+	}
+
+	.title {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+        .items {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            .close {
+                opacity: 0.4;
+                transition: 0.3s ease;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+
+		img {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+		}
+	}
+
+	.comment-card {
+		padding: 10px 15px;
+		border-radius: 10px;
+
+		.username {
+			font-size: 0.8em;
+			opacity: 0.5;
+			text-align: right;
 		}
 	}
 }
