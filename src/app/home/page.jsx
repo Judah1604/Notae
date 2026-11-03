@@ -128,7 +128,7 @@ function page() {
 				<div className="rooms">
 					{rooms.map((room) => (
 						<div className="room" key={room.id}>
-							<a href="/room">
+							<a href={"/room/" + room.id}>
 								<img
 									src={room.imageUrl}
 									alt={room.name}
