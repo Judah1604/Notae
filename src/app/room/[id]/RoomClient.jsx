@@ -14,7 +14,6 @@ export default function RoomClient({ room_id }) {
 	const [pins, setPins] = useState([]);
 	const [commentActive, setCommentActive] = useState(false);
 	const [comment, setComment] = useState("");
-	const [targetId, setTargetId] = useState(0);
 	const [currentUser, setCurrentUser] = useState(null);
 	const [activeDeleteId, setActiveDeleteId] = useState(null);
 	const [imageUrl, setImageUrl] = useState(null);
@@ -25,6 +24,65 @@ export default function RoomClient({ room_id }) {
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const commentRef = useRef(null);
+	const defaultPin = {
+		x: 0,
+		y: 0,
+		markerType: "x",
+		comment: "",
+	};
+	const [activePin, setActivePin] = useState(defaultPin);
+	const displayPins = commentActive
+		? [
+				...pins,
+				{
+					...activePin,
+					id: "active",
+					authorId: currentUser?.id,
+					comment,
+				},
+			]
+		: pins;
+
+	useEffect(() => {
+		const channel = supabase
+			.channel(`room-${room_id}-pins`)
+			.on(
+				"postgres_changes",
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "pins",
+					filter: `room_id=eq.${room_id}`,
+				},
+				(payload) => {
+					const newPin = payload.new;
+
+					setPins((prev) => {
+						// Prevent duplicate pins
+						if (prev.some((pin) => pin.id === newPin.id)) {
+							return prev;
+						}
+
+						return [
+							...prev,
+							{
+								id: newPin.id,
+								x: newPin.x,
+								y: newPin.y,
+								authorId: newPin.author_id,
+								markerType: newPin.marker_type,
+								comment: newPin.comment,
+							},
+						];
+					});
+				},
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
+	}, [room_id]);
 
 	useEffect(() => {
 		async function fetchRoomImage() {
@@ -134,10 +192,31 @@ export default function RoomClient({ room_id }) {
 			setCurrentUser(members.find((m) => m.id === user.id) ?? null);
 		}
 
+		async function fetchPins() {
+			const { data: fetchedPins, error: pinsErr } = await supabase
+				.from("pins")
+				.select("*")
+				.eq("room_id", room_id);
+
+			if (pinsErr) console.error(pinsErr);
+
+			setPins(
+				fetchedPins.map((pin) => ({
+					id: pin.id,
+					x: pin.x,
+					y: pin.y,
+					authorId: pin.author_id,
+					markerType: pin.marker_type,
+					comment: pin.comment,
+				})),
+			);
+		}
+
 		async function load() {
 			try {
 				await fetchRoomImage();
 				await loadMembers();
+				await fetchPins();
 			} finally {
 				setIsLoading(false);
 			}
@@ -168,7 +247,6 @@ export default function RoomClient({ room_id }) {
 	function handleImageClick(e) {
 		const MIN_DISTANCE = 0.04;
 		const rect = e.currentTarget.getBoundingClientRect();
-		const id = crypto.randomUUID();
 
 		const x = (e.clientX - rect.left) / rect.width;
 		const y = (e.clientY - rect.top) / rect.height;
@@ -182,12 +260,13 @@ export default function RoomClient({ room_id }) {
 
 		const markerType = Math.random() < 0.5 ? "x" : "scribble";
 
-		if (!tooClose && targetId === 0 && !activeDeleteId) {
-			setTargetId(id);
-			setPins((prev) => [
-				...prev,
-				{ id, x, y, markerType, authorId: currentUser.id },
-			]);
+		if (!tooClose && !activeDeleteId) {
+			setActivePin({
+				...defaultPin,
+				x,
+				y,
+				markerType,
+			});
 			setCommentActive(true);
 			commentRef.current?.focus();
 		}
@@ -199,24 +278,46 @@ export default function RoomClient({ room_id }) {
 		setCommentActive(false);
 	};
 
-	const handleSubmit = () => {
-		if (comment !== "") {
-			setPins((prev) =>
-				prev.map((pin) =>
-					pin.id === targetId ? { ...pin, comment } : pin,
-				),
-			);
-
-			setTargetId(0);
-			setComment("");
-			setCommentActive(false);
-		} else {
+	const handleSubmit = async () => {
+		if (!comment.trim()) {
 			alert("Please type in a comment!");
+			return;
 		}
+
+		const { data, error } = await supabase
+			.from("pins")
+			.insert({
+				room_id,
+				author_id: currentUser.id,
+				x: activePin.x,
+				y: activePin.y,
+				marker_type: activePin.markerType,
+				comment: comment.trim(),
+			})
+			.select()
+			.single();
+
+		if (error) {
+			console.error("Pin creation failed:", error);
+			return;
+		}
+
+		const savedPin = {
+			id: data.id,
+			x: data.x,
+			y: data.y,
+			markerType: data.marker_type,
+			authorId: data.author_id,
+			comment: data.comment,
+		};
+
+		setPins((prev) => [...prev, savedPin]);
+		setActivePin(defaultPin);
+		setComment("");
+		setCommentActive(false);
 	};
 	const handleClose = () => {
-		setPins((prev) => prev.filter((pin) => pin.id !== targetId));
-		setTargetId(0);
+		setActivePin(defaultPin);
 		setComment("");
 		setCommentActive(false);
 	};
@@ -251,17 +352,19 @@ export default function RoomClient({ room_id }) {
 									style={{ backgroundColor: user.color }}
 								></div>
 								<span>{user.name}</span>
-								{roomInfo.creator_id === user.id && (
+								{roomInfo.creator_id === user.id ? (
 									<div className="creator">Creator</div>
+								) : currentUser.id === user.id ? (
+									<div className="creator">You</div>
+								) : (
+									""
 								)}
 							</div>
 						))}
 					</div>
 				</div>
 			</div>
-            <div className="disclaimer">
-                Pinch and pan to navigate canvas.
-            </div>
+			<div className="disclaimer">Pinch and pan to navigate canvas.</div>
 			{isLoading ? (
 				<p className="text-center mt-3">Loading room information...</p>
 			) : !currentUser ? (
@@ -276,9 +379,9 @@ export default function RoomClient({ room_id }) {
 									onClick={handleImageClick}
 								>
 									<img src={imageUrl} alt="File Preview" />
-									{pins.map((pin, index) => (
+									{displayPins.map((pin) => (
 										<div
-											key={index}
+											key={pin.id}
 											className="pin"
 											style={{
 												left: `${pin.x * 100}%`,
@@ -290,7 +393,7 @@ export default function RoomClient({ room_id }) {
 													color={
 														findAuthor(pin)?.color
 													}
-													onClick={() => {
+													onClick={(e) => {
 														e.stopPropagation();
 														setActiveDeleteId(
 															pin.id,
@@ -302,7 +405,7 @@ export default function RoomClient({ room_id }) {
 													color={
 														findAuthor(pin)?.color
 													}
-													onClick={() => {
+													onClick={(e) => {
 														e.stopPropagation();
 														setActiveDeleteId(
 															pin.id,
@@ -343,7 +446,7 @@ export default function RoomClient({ room_id }) {
 														? "deletepin active"
 														: "deletepin"
 												}
-												onClick={() => {
+												onClick={(e) => {
 													e.stopPropagation();
 													deletePin(pin.id);
 												}}
