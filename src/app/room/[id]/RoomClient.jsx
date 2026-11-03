@@ -6,6 +6,8 @@ import ScribbleMarker from "../components/ScribbleMarker";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRef } from "react";
+import { TransformComponent } from "react-zoom-pan-pinch";
+import { TransformWrapper } from "react-zoom-pan-pinch";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -123,7 +125,7 @@ export default function RoomClient({ room_id }) {
 				.single();
 
 			if (creatorErr) console.error(creatorErr);
-            
+
 			setRoomInfo((prev) => ({
 				...prev,
 				members,
@@ -257,88 +259,107 @@ export default function RoomClient({ room_id }) {
 					</div>
 				</div>
 			</div>
+            <div className="disclaimer">
+                Pinch and pan to navigate canvas.
+            </div>
 			{isLoading ? (
 				<p className="text-center mt-3">Loading room information...</p>
 			) : !currentUser ? (
 				<p>Unable to load your room membership.</p>
 			) : (
 				<>
-					<div className="preview">
-						<div
-							className="image-wrapper"
-							onClick={handleImageClick}
-						>
-							<img src={imageUrl} alt="File Preview" />
-							{pins.map((pin, index) => (
+					<TransformWrapper>
+						<TransformComponent>
+							<div className="preview">
 								<div
-									key={index}
-									className="pin"
-									style={{
-										left: `${pin.x * 100}%`,
-										top: `${pin.y * 100}%`,
-									}}
+									className="image-wrapper"
+									onClick={handleImageClick}
 								>
-									{pin.markerType === "x" ? (
-										<XMarker
-											color={findAuthor(pin)?.color}
-											onClick={() => {
-												e.stopPropagation();
-												setActiveDeleteId(pin.id);
-											}}
-										/>
-									) : (
-										<ScribbleMarker
-											color={findAuthor(pin)?.color}
-											onClick={() => {
-												e.stopPropagation();
-												setActiveDeleteId(pin.id);
-											}}
-										/>
-									)}
-									<div
-										className={
-											!pin.comment
-												? "comment-card d-none"
-												: "comment-card"
-										}
-										style={{
-											backgroundColor:
-												findAuthor(pin)?.color,
-											color: getContrastColor(
-												findAuthor(pin)?.color,
-											),
-										}}
-									>
-										{pin.comment}
+									<img src={imageUrl} alt="File Preview" />
+									{pins.map((pin, index) => (
 										<div
-											className="username"
+											key={index}
+											className="pin"
 											style={{
-												color: getContrastColor(
-													findAuthor(pin)?.color,
-												),
+												left: `${pin.x * 100}%`,
+												top: `${pin.y * 100}%`,
 											}}
 										>
-											{findAuthor(pin)?.name}
+											{pin.markerType === "x" ? (
+												<XMarker
+													color={
+														findAuthor(pin)?.color
+													}
+													onClick={() => {
+														e.stopPropagation();
+														setActiveDeleteId(
+															pin.id,
+														);
+													}}
+												/>
+											) : (
+												<ScribbleMarker
+													color={
+														findAuthor(pin)?.color
+													}
+													onClick={() => {
+														e.stopPropagation();
+														setActiveDeleteId(
+															pin.id,
+														);
+													}}
+												/>
+											)}
+											<div
+												className={
+													!pin.comment
+														? "comment-card d-none"
+														: "comment-card"
+												}
+												style={{
+													backgroundColor:
+														findAuthor(pin)?.color,
+													color: getContrastColor(
+														findAuthor(pin)?.color,
+													),
+												}}
+											>
+												{pin.comment}
+												<div
+													className="username"
+													style={{
+														color: getContrastColor(
+															findAuthor(pin)
+																?.color,
+														),
+													}}
+												>
+													{findAuthor(pin)?.name}
+												</div>
+											</div>
+											<div
+												className={
+													activeDeleteId === pin.id
+														? "deletepin active"
+														: "deletepin"
+												}
+												onClick={() => {
+													e.stopPropagation();
+													deletePin(pin.id);
+												}}
+											>
+												<img
+													src="/icons/trash-2.svg"
+													alt=""
+												/>
+												Delete Pin
+											</div>
 										</div>
-									</div>
-									<div
-										className={
-											activeDeleteId === pin.id
-												? "deletepin active"
-												: "deletepin"
-										}
-										onClick={() => {
-											e.stopPropagation();
-											deletePin(pin.id);
-										}}
-									>
-										<img src="/icons/trash-2.svg" alt="" />
-										Delete Pin
-									</div>
+									))}
 								</div>
-							))}
-						</div>
-					</div>
+							</div>
+						</TransformComponent>
+					</TransformWrapper>
 					<div
 						className={
 							commentActive

@@ -10,6 +10,13 @@ body {
 		justify-content: space-between;
 		align-items: center;
 		padding: 15px;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 100;
+		background-color: #0a0a0aeb;
+		backdrop-filter: blur(8px);
 
 		.back {
 			a {
@@ -33,7 +40,6 @@ body {
 		.title {
 			font-weight: 600;
 		}
-
 		.members {
 			display: flex;
 			cursor: pointer;
@@ -49,9 +55,9 @@ body {
 					border-left: none;
 				}
 
-                &:hover ~ .members-drop {
-                    opacity: 1;
-                }
+				&:hover ~ .members-drop {
+					opacity: 1;
+				}
 			}
 
 			.count {
@@ -65,13 +71,13 @@ body {
 				padding: 15px 20px;
 				background-color: #121212;
 				border-radius: 15px;
-                border: 1px solid #181818;
-                opacity: 0;
-                transition: 0.2s ease;
-                display: flex;
-                flex-direction: column;
-                z-index: 1000;
-                gap: 10px;
+				border: 1px solid #181818;
+				opacity: 0;
+				transition: 0.2s ease;
+				display: flex;
+				flex-direction: column;
+				z-index: 1000;
+				gap: 10px;
 
 				.marker {
 					margin: 0 !important;
@@ -79,10 +85,10 @@ body {
 					height: 20px;
 				}
 
-                .creator {
-                    font-size: 0.8em;
-                    opacity: 0.2;
-                }
+				.creator {
+					font-size: 0.8em;
+					opacity: 0.2;
+				}
 
 				.item {
 					display: flex;
@@ -93,11 +99,24 @@ body {
 		}
 	}
 
+	.disclaimer {
+		position: absolute;
+		bottom: 10px;
+		right: 10px;
+        font-size: 0.8em;
+        opacity: 0.3;
+	}
+
 	.file-input {
 		padding: 30px;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.react-transform-wrapper {
+		height: 100vh;
+		width: 100%;
 	}
 
 	.preview {
