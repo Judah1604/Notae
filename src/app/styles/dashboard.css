@@ -70,7 +70,7 @@ body {
 		position: relative;
 		.display {
 			width: 100%;
-			height: auto;
+			max-height: 220px;
 			object-fit: cover;
 			border-radius: 10px;
 			margin-bottom: 10px;
@@ -93,6 +93,16 @@ body {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+
+			.items {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+
+                span {
+                    opacity: 0.3;
+                }
+			}
 		}
 
 		.deletebtn img {
@@ -148,19 +158,19 @@ body {
 		}
 	}
 
-    .text {
-        text-align: right;
+	.text {
+		text-align: right;
 
-        .form-group {
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 7px !important;
-        }
-        button {
-            margin-top: 15px;
-            padding: 15px 25px !important;
-            border-radius: 10px !important;
-        }
-    }
+		.form-group {
+			text-align: left;
+			display: flex;
+			flex-direction: column;
+			gap: 7px !important;
+		}
+		button {
+			margin-top: 15px;
+			padding: 15px 25px !important;
+			border-radius: 10px !important;
+		}
+	}
 }

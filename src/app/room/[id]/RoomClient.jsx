@@ -20,7 +20,10 @@ export default function RoomClient({ room_id }) {
 	const [currentUser, setCurrentUser] = useState(users[2]);
 	const [activeDeleteId, setActiveDeleteId] = useState(null);
 	const [imageUrl, setImageUrl] = useState(null);
-    const [room, setRoom] = useState(null);
+	const [roomInfo, setRoomInfo] = useState({
+		name: "Loading...",
+		members: [],
+	});
 
 	useEffect(() => {
 		async function fetchRoomImage() {
@@ -41,7 +44,7 @@ export default function RoomClient({ room_id }) {
 				return;
 			}
 
-            setRoom(room);
+			setRoomInfo((prev) => ({ ...prev, name: room.name }));
 
 			const { data, error } = await supabase.storage
 				.from("designs")
@@ -133,7 +136,7 @@ export default function RoomClient({ room_id }) {
 						<img src="/icons/chevron-left.svg" alt="" /> Back
 					</a>
 				</div>
-				<div className="title">{room?.name || "Loading..."}</div>
+				<div className="title">{roomInfo?.name || "Loading..."}</div>
 				<div className="members">
 					{users.map((user) => (
 						<div
@@ -220,6 +223,8 @@ export default function RoomClient({ room_id }) {
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							handleSubmit();
+						} else if (e.key === "Escape") {
+							handleClose();
 						}
 					}}
 				/>

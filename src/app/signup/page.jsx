@@ -9,6 +9,7 @@ function page() {
 		email: "",
 		password: "",
 	});
+	const [error, setError] = useState(null);
 
 	const handleChange = (e) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -16,7 +17,11 @@ function page() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		await signupAction(formData);
+		const result = await signupAction(formData);
+		if (result.error) {
+			setError(result.error);
+			console.error("Login error:", result.error);
+		}
 	};
 
 	return (
@@ -75,7 +80,10 @@ function page() {
 					Create Account
 				</button>
 				<div className="extra">
-					Already have an account? <a href="/login">Log in</a>
+					<div className="account">
+						Already have an account? <a href="/login">Log in</a>
+					</div>
+					<div className="error">{error && <p>{error}</p>}</div>
 				</div>
 			</form>
 		</div>

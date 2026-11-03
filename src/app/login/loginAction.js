@@ -14,11 +14,9 @@ export const loginAction = async (formData) => {
 	// console.log("Login data:", data);
 	// console.log("Login error:", error);
 
-	if (error) {
-		return { error: error.message };
-	}
-
 	if (data.session) {
 		redirect("/home");
-	}
+	} else if (!data.session || error) {
+        return { error: "Login failed. Please try again." };
+    }
 };

@@ -4,9 +4,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-    background: url(/authform-bg.png);
-    background-size: cover;
-    background-position: center;
+	background: url(/authform-bg.png);
+	background-size: cover;
+	background-position: center;
 
 	form {
 		width: 700px;
@@ -15,30 +15,30 @@
 		display: flex;
 		flex-direction: column;
 		gap: 15px;
-        background-color: var(--background);
+		background-color: var(--background);
 
-        .header {
-            text-align: center;
+		.header {
+			text-align: center;
 
-            span {
-                font-family: var(--font-eb_garamond);
-                font-weight: 200;
-                font-size: 1.3em;
-            }
+			span {
+				font-family: var(--font-eb_garamond);
+				font-weight: 200;
+				font-size: 1.3em;
+			}
 
-            img {
-                height: 40px;
-            }
+			img {
+				height: 40px;
+			}
 
-            p {
-                width: 90%;
-                margin: auto;
-            }
-        }
+			p {
+				width: 90%;
+				margin: auto;
+			}
+		}
 
 		h1 {
 			font-size: 2.6em;
-            margin-bottom: -3px;
+			margin-bottom: -3px;
 		}
 
 		.form-group {
@@ -65,7 +65,21 @@
 		}
 
 		.extra {
-			color: #515151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            p {
+                margin: 0;
+            }
+
+            .error {
+                font-size: 0.8em;
+                color: #ff383c;
+            }
+			.account {
+				color: #515151;
+			}
 
 			a {
 				color: white;

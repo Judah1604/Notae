@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import "../styles/dashboard.css";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Topbar from "../utils/components/Topbar";
 
 const supabase = createClient();
+
 function page() {
 	const [user, setUser] = useState({
 		id: null,
@@ -13,11 +15,6 @@ function page() {
 		color: "#000000",
 	});
 	const router = useRouter();
-	const pathname = usePathname();
-	const menuItems = [
-		{ name: "Home", path: "/home" },
-		{ name: "Profile", path: "/profile" },
-	];
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [imageSrc, setImageSrc] = useState("");
 	const [roomName, setRoomName] = useState("");
@@ -61,8 +58,9 @@ function page() {
 				color: profile?.color || "#000000",
 			}));
 		}
+
 		async function load() {
-			await getUserData();
+			await getUserData(supabase, setUser, router);
 		}
 
 		load();
@@ -117,7 +115,7 @@ function page() {
 			return;
 		}
 
-        console.log("Room created:", room);
+		console.log("Room created:", room);
 
 		// 2. Add creator to room_members
 		const { error: memberError } = await supabase
@@ -166,33 +164,7 @@ function page() {
 
 	return (
 		<div className="create_room">
-			<div className="topbar">
-				<div className="title">
-					<img src="/logo.svg" alt="Notae" />
-					<div className="account">
-						<div
-							className="marker"
-							style={{ backgroundColor: user.color }}
-						></div>
-						<div className="name">{user.name}</div>
-					</div>
-				</div>
-				<div className="menu">
-					<div className="links">
-						{menuItems.map((item) => (
-							<a
-								key={item.path}
-								href={item.path}
-								className={
-									pathname.includes(item.path) ? "active" : ""
-								}
-							>
-								{item.name}
-							</a>
-						))}
-					</div>
-				</div>
-			</div>
+			<Topbar user={user} />
 			<div className="section mt-3 px-4">
 				<h2>Create Room</h2>
 				<div className="wrapper">
