@@ -19,7 +19,7 @@ function Topbar({ user }) {
 					<div className="name">{user.name}</div>
 				</div>
 			</div>
-			<div className="menu">
+			<div className="menu mt-4">
 				<div className="links">
 					{menuItems.map((item) => (
 						<a
@@ -33,10 +33,6 @@ function Topbar({ user }) {
 						</a>
 					))}
 				</div>
-				<a href="/create-room" className="btn">
-					<img src="/icons/plus.svg" alt="" />
-					Create new Room
-				</a>
 			</div>
 		</div>
 	);

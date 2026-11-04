@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import "../styles/dashboard.css";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Topbar from "../utils/components/Topbar";
+import Topbar from "../components/Topbar";
 
 const supabase = createClient();
 
@@ -14,7 +13,6 @@ function page() {
 		name: "Loading...",
 		color: "#000000",
 	});
-	const router = useRouter();
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [imageSrc, setImageSrc] = useState("");
 	const [roomName, setRoomName] = useState("");
@@ -159,7 +157,7 @@ function page() {
 		}
 
 		// 5. Navigate to room
-		router.replace(`/room/${room.id}`);
+		redirect(`/room/${room.id}`);
 	};
 
 	return (

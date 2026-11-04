@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import "../styles/dashboard.css";
-import Topbar from "../utils/components/Topbar";
+import Topbar from "../components/Topbar";
 
 const supabase = createClient();
 function page() {
