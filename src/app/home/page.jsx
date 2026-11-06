@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import "../styles/dashboard.css";
 import Topbar from "../components/Topbar";
-import timeAgo from "../../lib/timeAgo";
+import { timeAgo } from "@/lib/timeAgo";
 
 const supabase = createClient();
 function page() {

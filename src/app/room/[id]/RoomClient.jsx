@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRef } from "react";
 import { TransformComponent } from "react-zoom-pan-pinch";
 import { TransformWrapper } from "react-zoom-pan-pinch";
+import { formatTime } from "@/lib/timeAgo";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -43,6 +44,11 @@ export default function RoomClient({ room_id }) {
 				},
 			]
 		: pins;
+	const [isCopying, setIsCopying] = useState(false);
+	const [reply, setReply] = useState("");
+	const [replies, setReplies] = useState([]);
+	const [repliesLoading, setRepliesLoading] = useState(false);
+	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 	useEffect(() => {
 		const channel = supabase
@@ -255,10 +261,13 @@ export default function RoomClient({ room_id }) {
 		return brightness > 128 ? "#000000" : "#FFFFFF";
 	}
 
-	function findAuthor(pin) {
-		const author = roomInfo.members.find(
-			(member) => member.id === pin?.authorId,
-		);
+	function findAuthor(input) {
+		const author =
+			typeof input === "object"
+				? roomInfo.members.find(
+						(member) => member.id === input?.authorId,
+					)
+				: roomInfo.members.find((member) => member.id === input);
 		return author;
 	}
 
@@ -306,10 +315,15 @@ export default function RoomClient({ room_id }) {
 		setActiveDeleteId(null);
 	};
 
-	function copyLink() {
-		const currentUrl = window.location.href;
-
-		navigator.clipboard.writeText(currentUrl);
+	async function copyLink() {
+		setIsCopying(true);
+		try {
+			const currentUrl = window.location.href;
+			navigator.clipboard.writeText(currentUrl);
+			await delay(3000);
+		} finally {
+			setIsCopying(false);
+		}
 	}
 
 	const handleSubmit = async () => {
@@ -359,6 +373,48 @@ export default function RoomClient({ room_id }) {
 	const showPinDetails = async (pin) => {
 		// console.log(pin);
 		setPinDetail(pin);
+
+		try {
+			setRepliesLoading(true);
+
+			const { data: repliesData, error } = await supabase
+				.from("replies")
+				.select("*")
+				.eq("pin_id", pin.id);
+
+			if (error) {
+				console.error(error);
+			}
+
+			setReplies(repliesData);
+		} finally {
+			setRepliesLoading(false);
+		}
+	};
+	const addReply = async (pin) => {
+		if (reply === "") {
+			alert("Please write your reply");
+			return;
+		}
+		// console.log(pinDetail)
+
+		const { data, error } = await supabase
+			.from("replies")
+			.insert({ pin_id: pin.id, author_id: currentUser.id, text: reply });
+
+		if (error) console.error(error);
+
+		const { data: repliesData, error: replyErr } = await supabase
+			.from("replies")
+			.select("*")
+			.eq("pin_id", pin.id);
+
+		if (replyErr) {
+			console.error(replyErr);
+		}
+
+		setReplies(repliesData);
+		setReply("");
 	};
 
 	return (
@@ -405,7 +461,11 @@ export default function RoomClient({ room_id }) {
 					</div>
 					<button className="btn" onClick={copyLink}>
 						<img src="/icons/link.svg" alt="" />
-						Copy Link
+						{isCopying ? (
+							<span>Copied</span>
+						) : (
+							<span>Copy Link</span>
+						)}
 					</button>
 				</div>
 			</div>
@@ -545,7 +605,14 @@ export default function RoomClient({ room_id }) {
 									className="close"
 									onClick={() => setActiveDeleteId(null)}
 								/>
-								<span>{findAuthor(pinDetail)?.name}'s Pin</span>
+								<span>
+									{findAuthor(pinDetail)?.authorId ===
+									currentUser.id ? (
+										<>Your Pin</>
+									) : (
+										findAuthor(pinDetail)?.name + "'s Pin"
+									)}
+								</span>
 							</div>
 							{pinDetail?.authorId === currentUser?.id && (
 								<img
@@ -567,17 +634,57 @@ export default function RoomClient({ room_id }) {
 								}}
 							>
 								{pinDetail?.comment}
-								<div
-									className="username"
-									style={{
-										color: getContrastColor(
-											findAuthor(pinDetail)?.color,
-										),
-									}}
-								>
-									{findAuthor(pinDetail)?.name}
-								</div>
 							</div>
+							{repliesLoading ? (
+								<span className="text-center mt-2">
+									Loading replies...
+								</span>
+							) : (
+								<div className="replies mt-2">
+									{replies.length === 0 ? (
+										<span className="text-center">
+											No replies found
+										</span>
+									) : (
+										<>
+											{replies.map((reply) => (
+												<div
+													className={
+														"comment-card reply"
+													}
+													key={reply.id}
+												>
+													{reply.text}
+													<div className="items">
+														<div
+															className="marker"
+															style={{
+																backgroundColor:
+																	findAuthor(
+																		reply.author_id,
+																	)?.color,
+															}}
+														></div>
+														<div className="username">
+															{
+																findAuthor(
+																	reply.author_id,
+																)?.name
+															}
+														</div>
+
+														<div className="time">
+															{formatTime(
+																reply.created_at,
+															)}
+														</div>
+													</div>
+												</div>
+											))}
+										</>
+									)}
+								</div>
+							)}
 						</div>
 						<div className="disclaimer">Enter to send</div>
 
@@ -586,6 +693,13 @@ export default function RoomClient({ room_id }) {
 								type="text"
 								className="form-control"
 								placeholder="Enter your reply"
+								value={reply}
+								onChange={(e) => setReply(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										addReply(pinDetail);
+									}
+								}}
 							/>
 						</div>
 					</div>

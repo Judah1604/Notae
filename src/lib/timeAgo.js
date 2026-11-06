@@ -1,4 +1,4 @@
-export default function timeAgo(timestamp) {
+export function timeAgo(timestamp) {
 	const seconds = Math.floor(
 		(Date.now() - new Date(timestamp).getTime()) / 1000,
 	);
@@ -22,4 +22,13 @@ export default function timeAgo(timestamp) {
 
 	const years = Math.floor(days / 365);
 	return `${years}y ago`;
+}
+
+export function formatTime(timestamp) {
+	return new Date(timestamp).toLocaleTimeString("en-GB", {
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+		timeZone: "Africa/Lagos",
+	});
 }
