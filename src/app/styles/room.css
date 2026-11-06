@@ -37,6 +37,30 @@ body {
 			}
 		}
 
+        .items {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .btn {
+                background-color: #262626 !important;
+                color: white !important;
+                
+                padding: 10px 20px !important;
+                
+                &:hover {
+                    background-color: #323232 !important;
+
+                }
+
+                img {
+                    width: 20px;
+                    margin-right: 10px;
+                }
+
+            }
+        }
+
 		.title {
 			font-weight: 600;
 		}

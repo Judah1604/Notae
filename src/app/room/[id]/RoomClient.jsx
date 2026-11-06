@@ -306,6 +306,12 @@ export default function RoomClient({ room_id }) {
 		setActiveDeleteId(null);
 	};
 
+	function copyLink() {
+		const currentUrl = window.location.href;
+
+		navigator.clipboard.writeText(currentUrl);
+	}
+
 	const handleSubmit = async () => {
 		if (!comment.trim()) {
 			alert("Please type in a comment!");
@@ -364,37 +370,43 @@ export default function RoomClient({ room_id }) {
 					</a>
 				</div>
 				<div className="title">{roomInfo?.name || "Loading..."}</div>
-				<div className="members">
-					{roomInfo.members.map((user) => (
-						<div
-							key={user.id}
-							className="marker"
-							style={{ backgroundColor: user.color }}
-						></div>
-					))}
-					<div className="count">
-						{roomInfo.members.length > 3
-							? `+${roomInfo.members.length - 3}`
-							: ""}
-					</div>
-					<div className="members-drop">
+				<div className="items">
+					<div className="members">
 						{roomInfo.members.map((user) => (
-							<div className="item" key={user.id}>
-								<div
-									className="marker"
-									style={{ backgroundColor: user.color }}
-								></div>
-								<span>{user.name}</span>
-								{roomInfo.creator_id === user.id ? (
-									<div className="creator">Creator</div>
-								) : currentUser.id === user.id ? (
-									<div className="creator">You</div>
-								) : (
-									""
-								)}
-							</div>
+							<div
+								key={user.id}
+								className="marker"
+								style={{ backgroundColor: user.color }}
+							></div>
 						))}
+						<div className="count">
+							{roomInfo.members.length > 3
+								? `+${roomInfo.members.length - 3}`
+								: ""}
+						</div>
+						<div className="members-drop">
+							{roomInfo.members.map((user) => (
+								<div className="item" key={user.id}>
+									<div
+										className="marker"
+										style={{ backgroundColor: user.color }}
+									></div>
+									<span>{user.name}</span>
+									{roomInfo.creator_id === user.id ? (
+										<div className="creator">Creator</div>
+									) : currentUser.id === user.id ? (
+										<div className="creator">You</div>
+									) : (
+										""
+									)}
+								</div>
+							))}
+						</div>
 					</div>
+					<button className="btn" onClick={copyLink}>
+						<img src="/icons/link.svg" alt="" />
+						Copy Link
+					</button>
 				</div>
 			</div>
 			<div className="disclaimer">Pinch and pan to navigate canvas.</div>

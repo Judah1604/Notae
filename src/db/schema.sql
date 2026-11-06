@@ -18,3 +18,20 @@ CREATE TABLE room_members (
   user_id uuid NOT NULL REFERENCES profiles(id),
   joined_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+create table public.replies (
+  id uuid primary key default gen_random_uuid(),
+
+  pin_id uuid not null
+    references public.pins(id)
+    on delete cascade,
+
+  author_id uuid not null
+    references auth.users(id)
+    on delete cascade,
+
+  comment text not null,
+
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
