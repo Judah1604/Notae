@@ -818,6 +818,7 @@ export default function RoomClient({ room_id }) {
 						findAuthor={findAuthor}
 						setPinDetail={setPinDetail}
 						zoomRef={zoomRef}
+                        sidebarActive={sideBarActive}
 					/>
 				</>
 			)}
