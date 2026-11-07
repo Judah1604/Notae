@@ -9,6 +9,7 @@ import { useRef } from "react";
 import { TransformComponent } from "react-zoom-pan-pinch";
 import { TransformWrapper } from "react-zoom-pan-pinch";
 import { formatTime } from "@/lib/timeAgo";
+import PinsSidebar from "../components/PinsSidebar";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -25,6 +26,7 @@ export default function RoomClient({ room_id }) {
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const commentRef = useRef(null);
+	const zoomRef = useRef(null);
 	const defaultPin = {
 		x: 0,
 		y: 0,
@@ -33,6 +35,7 @@ export default function RoomClient({ room_id }) {
 	};
 	const [activePin, setActivePin] = useState(defaultPin);
 	const [pinDetail, setPinDetail] = useState(null);
+    const [sideBarActive, setSideBarActive] = useState(true)
 	const displayPins = commentActive
 		? [
 				...pins,
@@ -106,6 +109,43 @@ export default function RoomClient({ room_id }) {
 			supabase.removeChannel(channel);
 		};
 	}, [room_id]);
+
+	useEffect(() => {
+		if (!pinDetail?.id) return;
+
+		const channel = supabase
+			.channel(`replies-${pinDetail.id}`)
+			.on(
+				"postgres_changes",
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "replies",
+					filter: `pin_id=eq.${pinDetail.id}`,
+				},
+				(payload) => {
+					const newReply = payload.new;
+
+					setReplies((currentReplies) => {
+						// Prevent duplicate replies from local inserts and realtime events.
+						if (
+							currentReplies.some(
+								(item) => item.id === newReply.id,
+							)
+						) {
+							return currentReplies;
+						}
+
+						return [...currentReplies, newReply];
+					});
+				},
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
+	}, [pinDetail?.id, supabase]);
 
 	useEffect(() => {
 		async function fetchRoomImage() {
@@ -219,9 +259,27 @@ export default function RoomClient({ room_id }) {
 			const { data: fetchedPins, error: pinsErr } = await supabase
 				.from("pins")
 				.select("*")
-				.eq("room_id", room_id);
+				.eq("room_id", room_id)
+				.order("created_at", { ascending: false });
 
-			if (pinsErr) console.error(pinsErr);
+			if (pinsErr) {
+				console.error(pinsErr);
+				return;
+			}
+
+			const { data: replyData, error: replyErr } = await supabase
+				.from("replies")
+				.select("pin_id");
+
+			if (replyErr) {
+				console.error(replyErr);
+				return;
+			}
+
+			const replyCounts = replyData.reduce((acc, reply) => {
+				acc[reply.pin_id] = (acc[reply.pin_id] || 0) + 1;
+				return acc;
+			}, {});
 
 			setPins(
 				fetchedPins.map((pin) => ({
@@ -231,6 +289,8 @@ export default function RoomClient({ room_id }) {
 					authorId: pin.author_id,
 					markerType: pin.marker_type,
 					comment: pin.comment,
+					created_at: pin.created_at,
+					replyCount: replyCounts[pin.id] || 0,
 				})),
 			);
 		}
@@ -350,6 +410,20 @@ export default function RoomClient({ room_id }) {
 			return;
 		}
 
+		const { data: replyData, error: replyErr } = await supabase
+			.from("replies")
+			.select("pin_id");
+
+		if (replyErr) {
+			console.error(replyErr);
+			return;
+		}
+
+		const replyCounts = replyData.reduce((acc, reply) => {
+			acc[reply.pin_id] = (acc[reply.pin_id] || 0) + 1;
+			return acc;
+		}, {});
+
 		const savedPin = {
 			id: data.id,
 			x: data.x,
@@ -357,9 +431,11 @@ export default function RoomClient({ room_id }) {
 			markerType: data.marker_type,
 			authorId: data.author_id,
 			comment: data.comment,
+			created_at: data.created_at,
+			replyCount: replyCounts[data.id] || 0,
 		};
 
-		setPins((prev) => [...prev, savedPin]);
+		setPins((prev) => [savedPin, ...prev]);
 		setActivePin(defaultPin);
 		setComment("");
 		setCommentActive(false);
@@ -392,7 +468,7 @@ export default function RoomClient({ room_id }) {
 		}
 	};
 	const addReply = async (pin) => {
-		if (reply === "") {
+		if (!reply.trim()) {
 			alert("Please write your reply");
 			return;
 		}
@@ -400,20 +476,24 @@ export default function RoomClient({ room_id }) {
 
 		const { data, error } = await supabase
 			.from("replies")
-			.insert({ pin_id: pin.id, author_id: currentUser.id, text: reply });
+			.insert({
+				pin_id: pin.id,
+				author_id: currentUser.id,
+				text: reply.trim(),
+			})
+			.select()
+			.single();
 
 		if (error) console.error(error);
 
-		const { data: repliesData, error: replyErr } = await supabase
-			.from("replies")
-			.select("*")
-			.eq("pin_id", pin.id);
+		setReplies((currentReplies) => {
+			if (currentReplies.some((item) => item.id === data.id)) {
+				return currentReplies;
+			}
 
-		if (replyErr) {
-			console.error(replyErr);
-		}
+			return [...currentReplies, data];
+		});
 
-		setReplies(repliesData);
 		setReply("");
 	};
 
@@ -421,9 +501,17 @@ export default function RoomClient({ room_id }) {
 		<div className="wrapper">
 			<div className="top">
 				<div className="back">
-					<a href="/home">
-						<img src="/icons/chevron-left.svg" alt="" /> Back
-					</a>
+					<div className="items">
+						<a href="/home">
+							<img src="/icons/chevron-left.svg" alt="" /> Back
+						</a>
+						<button
+							className="btn"
+							onClick={() => setSideBarActive((prev) => !prev)}
+						>
+							{sideBarActive ? "Close Sidebar" : "Open Sidebar"}
+						</button>
+					</div>
 				</div>
 				<div className="title">{roomInfo?.name || "Loading..."}</div>
 				<div className="items">
@@ -477,81 +565,103 @@ export default function RoomClient({ room_id }) {
 			) : (
 				<>
 					<TransformWrapper>
-						<TransformComponent>
-							<div className="preview">
-								<div
-									className="image-wrapper"
-									onClick={handleImageClick}
-								>
-									<img src={imageUrl} alt="File Preview" />
-									{displayPins.map((pin) => (
+						{({ zoomToElement }) => {
+							zoomRef.current = zoomToElement;
+
+							return (
+								<TransformComponent>
+									<div className="preview">
 										<div
-											key={pin.id}
-											className="pin"
-											style={{
-												left: `${pin.x * 100}%`,
-												top: `${pin.y * 100}%`,
-											}}
+											className="image-wrapper"
+											onClick={handleImageClick}
 										>
-											{pin.markerType === "x" ? (
-												<XMarker
-													color={
-														findAuthor(pin)?.color
-													}
-													onClick={(e) => {
-														e.stopPropagation();
-														setActiveDeleteId(
-															pin.id,
-														);
-														showPinDetails(pin);
-													}}
-												/>
-											) : (
-												<ScribbleMarker
-													color={
-														findAuthor(pin)?.color
-													}
-													onClick={(e) => {
-														e.stopPropagation();
-														setActiveDeleteId(
-															pin.id,
-														);
-														showPinDetails(pin);
-													}}
-												/>
-											)}
-											<div
-												className={
-													!pin.comment
-														? "comment-card d-none"
-														: "comment-card"
-												}
-												style={{
-													backgroundColor:
-														findAuthor(pin)?.color,
-													color: getContrastColor(
-														findAuthor(pin)?.color,
-													),
-												}}
-											>
-												{pin.comment}
+											<img
+												src={imageUrl}
+												alt="File Preview"
+											/>
+											{displayPins.map((pin) => (
 												<div
-													className="username"
+													key={pin.id}
+													id={`pin-${pin.id}`}
+													className="pin"
 													style={{
-														color: getContrastColor(
-															findAuthor(pin)
-																?.color,
-														),
+														left: `${pin.x * 100}%`,
+														top: `${pin.y * 100}%`,
 													}}
 												>
-													{findAuthor(pin)?.name}
+													{pin.markerType === "x" ? (
+														<XMarker
+															color={
+																findAuthor(pin)
+																	?.color
+															}
+															onClick={(e) => {
+																e.stopPropagation();
+																setActiveDeleteId(
+																	pin.id,
+																);
+																showPinDetails(
+																	pin,
+																);
+															}}
+														/>
+													) : (
+														<ScribbleMarker
+															color={
+																findAuthor(pin)
+																	?.color
+															}
+															onClick={(e) => {
+																e.stopPropagation();
+																setActiveDeleteId(
+																	pin.id,
+																);
+																showPinDetails(
+																	pin,
+																);
+															}}
+														/>
+													)}
+													<div
+														className={
+															!pin.comment
+																? "comment-card d-none"
+																: "comment-card"
+														}
+														style={{
+															backgroundColor:
+																findAuthor(pin)
+																	?.color,
+															color: getContrastColor(
+																findAuthor(pin)
+																	?.color,
+															),
+														}}
+													>
+														{pin.comment}
+														<div
+															className="username"
+															style={{
+																color: getContrastColor(
+																	findAuthor(
+																		pin,
+																	)?.color,
+																),
+															}}
+														>
+															{
+																findAuthor(pin)
+																	?.name
+															}
+														</div>
+													</div>
 												</div>
-											</div>
+											))}
 										</div>
-									))}
-								</div>
-							</div>
-						</TransformComponent>
+									</div>
+								</TransformComponent>
+							);
+						}}
 					</TransformWrapper>
 					<div
 						className={
@@ -592,9 +702,7 @@ export default function RoomClient({ room_id }) {
 					</div>
 					<div
 						className={
-							activeDeleteId
-								? "pin-details active"
-								: "pin-details"
+							pinDetail ? "pin-details active" : "pin-details"
 						}
 					>
 						<div className="title">
@@ -603,11 +711,13 @@ export default function RoomClient({ room_id }) {
 									src="/icons/x.svg"
 									alt=""
 									className="close"
-									onClick={() => setActiveDeleteId(null)}
+									onClick={() => {
+										setPinDetail(null);
+										setActiveDeleteId(null);
+									}}
 								/>
 								<span>
-									{findAuthor(pinDetail)?.authorId ===
-									currentUser.id ? (
+									{pinDetail?.authorId === currentUser?.id ? (
 										<>Your Pin</>
 									) : (
 										findAuthor(pinDetail)?.name + "'s Pin"
@@ -703,6 +813,12 @@ export default function RoomClient({ room_id }) {
 							/>
 						</div>
 					</div>
+					<PinsSidebar
+						pins={pins}
+						findAuthor={findAuthor}
+						setPinDetail={setPinDetail}
+						zoomRef={zoomRef}
+					/>
 				</>
 			)}
 		</div>
