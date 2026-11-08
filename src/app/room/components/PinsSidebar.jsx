@@ -1,18 +1,23 @@
 import { formatTime } from "@/lib/timeAgo";
 import React from "react";
+import { useState } from "react";
 
 function PinsSidebar({
 	pins,
 	findAuthor,
 	setPinDetail,
 	zoomRef,
-	sidebarActive,
+	roomInfo,
 }) {
+    const [sideBarActive, setSideBarActive] = useState(true);
+
 	return (
-		<div className={sidebarActive ? "pins-sidebar active" : "pins-sidebar"}>
+		<div className={sideBarActive ? "pins-sidebar active" : "pins-sidebar"}>
 			<div className="header">
-				<h3>Pins</h3>
-				<span>Live</span>
+				<a href="/home">
+					<img src="/icons/chevron-left.svg" alt="" />
+				</a>
+				<h3>{roomInfo?.name || "Loading..."}</h3>
 			</div>
 			<div className="pins">
 				{pins.length === 0 ? (

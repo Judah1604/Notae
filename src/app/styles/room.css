@@ -5,66 +5,36 @@ body {
 }
 
 .wrapper {
+	display: grid;
+	grid-template-columns: 1.2fr 3fr;
+
 	.top {
 		display: flex;
-		justify-content: space-between;
+		justify-content: end;
 		align-items: center;
 		padding: 15px;
-		position: absolute;
-		top: 0;
-		left: 0;
 		width: 100%;
-		z-index: 10;
 		background-color: #0a0a0aeb;
 		backdrop-filter: blur(8px);
+        gap: 20px;
 
-		.back {
-			.items {
-				gap: 20px;
-			}
-			a {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-				opacity: 0.3;
-				transition: 0.3s ease;
-				&:hover {
-					opacity: 1;
-				}
+
+		.btn {
+			background-color: #262626 !important;
+			color: white !important;
+
+			padding: 10px 20px !important;
+
+			&:hover {
+				background-color: #323232 !important;
 			}
 
 			img {
 				width: 20px;
-				height: 20px;
-				cursor: pointer;
+				margin-right: 10px;
 			}
 		}
 
-		.items {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-
-			.btn {
-				background-color: #262626 !important;
-				color: white !important;
-
-				padding: 10px 20px !important;
-
-				&:hover {
-					background-color: #323232 !important;
-				}
-
-				img {
-					width: 20px;
-					margin-right: 10px;
-				}
-			}
-		}
-
-		.title {
-			font-weight: 600;
-		}
 		.members {
 			display: flex;
 			cursor: pointer;
@@ -296,6 +266,15 @@ body {
 		display: flex;
 		flex-direction: column;
 
+        .comment-card {
+            display: flex;
+            justify-content: space-between;
+
+            img  {
+                width: 20px;
+            }
+        }
+
 		.replies {
 			display: flex;
 			flex-direction: column;
@@ -386,22 +365,16 @@ body {
 }
 
 .pins-sidebar {
-	position: absolute;
-	bottom: 10px;
-	left: 10px;
 	background-color: #121212fa;
 	backdrop-filter: blur(9px);
-	height: 90%;
-	width: 380px;
 	border-radius: 15px;
-	z-index: 10;
+    height: 100vh;
 	overflow-y: scroll;
-	transform: translateX(-120%);
-	transition: 0.3s ease;
 
-	&.active {
+	/* &.active {
 		transform: translateX(0) !important;
-	}
+	} */
+
 
 	&::-webkit-scrollbar {
 		width: 5px;
@@ -414,35 +387,42 @@ body {
 
 	.header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: start;
 		align-items: center;
 		margin-bottom: 10px;
 		position: sticky;
 		top: 0;
 		background-color: #121212fa;
-		border-radius: 100px;
-		backdrop-filter: blur(5px);
+		gap: 10px;
 		padding: 0 10px;
-		z-index: 1000;
-		padding: 30px;
+		padding: 20px;
 		padding-bottom: 0;
+        backdrop-filter: blur(9px);
+        z-index: 100;
 
-		span {
-			background-color: rgb(0, 196, 0, 0.1);
-			padding: 5px 12px;
-			border-radius: 30px;
-			color: rgb(0, 196, 0);
-			font-size: 0.9em;
+		a {
 			display: flex;
 			align-items: center;
-			gap: 5px;
+			gap: 10px;
+			opacity: 0.3;
+			transition: 0.3s ease;
+			&:hover {
+				opacity: 1;
+			}
 		}
+
+		img {
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+		}
+
 	}
 
 	.pins {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 7px;
 		padding: 30px 10px;
 		padding-top: 0;
 
@@ -450,7 +430,6 @@ body {
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
-			border-bottom: 1px solid #1f1f1f;
 			padding: 10px 15px;
 			padding-bottom: 15px;
 			cursor: pointer;
