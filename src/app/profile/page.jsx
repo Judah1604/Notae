@@ -72,7 +72,10 @@ function page() {
 			<Topbar user={user} />
 
 			<div className="profile p-3">
-				<button onClick={handleLogout}>Sign out</button>
+				<div className="signout">
+					<h2>Sign out</h2>
+					<button onClick={handleLogout}>Sign out</button>
+				</div>
 			</div>
 		</div>
 	);

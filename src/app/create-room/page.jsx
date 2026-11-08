@@ -4,6 +4,7 @@ import "../styles/dashboard.css";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Topbar from "../components/Topbar";
+import { redirect } from "next/navigation";
 
 const supabase = createClient();
 
@@ -29,7 +30,7 @@ function page() {
 			}
 
 			if (!userData) {
-				router.replace("/login");
+				redirect("/login");
 				return;
 			}
 
@@ -58,7 +59,7 @@ function page() {
 		}
 
 		async function load() {
-			await getUserData(supabase, setUser, router);
+			await getUserData(supabase, setUser);
 		}
 
 		load();
@@ -202,7 +203,10 @@ function page() {
 								onChange={(e) => setRoomName(e.target.value)}
 							/>
 						</div>
-						<button type="submit">Create Room</button>
+						<div className="items">
+							<span>File max: 6MB</span>
+							<button type="submit">Create Room</button>
+						</div>
 					</form>
 				</div>
 			</div>

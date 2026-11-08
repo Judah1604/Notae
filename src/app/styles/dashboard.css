@@ -195,6 +195,11 @@ body {
 		}
 	}
 
+    .items {
+        display: flex;
+        justify-content: space-between;
+    }
+
 	.text {
 		text-align: right;
 
@@ -210,4 +215,13 @@ body {
 			border-radius: 10px !important;
 		}
 	}
+}
+
+.profile {
+    .signout {
+        button {
+            padding: 15px 30px !important;
+            margin-top: 20px;
+        }
+    }
 }
