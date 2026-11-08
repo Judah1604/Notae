@@ -17,7 +17,6 @@ export default function RoomClient({ room_id }) {
 	const [commentActive, setCommentActive] = useState(false);
 	const [comment, setComment] = useState("");
 	const [currentUser, setCurrentUser] = useState(null);
-	const [activeDeleteId, setActiveDeleteId] = useState(null);
 	const [imageUrl, setImageUrl] = useState(null);
 	const [roomInfo, setRoomInfo] = useState({
 		name: "Loading...",
@@ -51,6 +50,7 @@ export default function RoomClient({ room_id }) {
 	const [replies, setReplies] = useState([]);
 	const [repliesLoading, setRepliesLoading] = useState(false);
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+	const [inputMode, setInputMode] = useState({ mode: "normal", to: "reply", idToDelete: null });
 
 	useEffect(() => {
 		const channel = supabase
@@ -84,6 +84,32 @@ export default function RoomClient({ room_id }) {
 							},
 						];
 					});
+				},
+			)
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "pins",
+					filter: `room_id=eq.${room_id}`,
+				},
+				(payload) => {
+					const updatedPin = payload.new;
+
+					setPins((prev) =>
+						prev.map((pin) =>
+							pin.id === updatedPin.id
+								? { ...pin, comment: updatedPin.comment }
+								: pin,
+						),
+					);
+
+					setPinDetail((prev) =>
+						prev?.id === updatedPin.id
+							? { ...prev, comment: updatedPin.comment }
+							: prev,
+					);
 				},
 			)
 			.on(
@@ -346,7 +372,7 @@ export default function RoomClient({ room_id }) {
 
 		const markerType = Math.random() < 0.5 ? "x" : "scribble";
 
-		if (!tooClose && !activeDeleteId) {
+		if (!tooClose) {
 			setActivePin({
 				...defaultPin,
 				x,
@@ -371,7 +397,7 @@ export default function RoomClient({ room_id }) {
 		}
 
 		setPins((prev) => prev.filter((pin) => pin.id !== pinId));
-		setActiveDeleteId(null);
+		setPinDetail(null);
 	};
 
 	async function copyLink() {
@@ -496,14 +522,74 @@ export default function RoomClient({ room_id }) {
 		setReply("");
 	};
 
+	const editComment = async (pin_id) => {
+		const { data, error } = await supabase
+			.from("pins")
+			.update({
+				comment: reply,
+			})
+			.eq("id", pin_id)
+			.select()
+			.single();
+
+		if (error) {
+			console.error(error);
+			return;
+		}
+
+		setPins((prev) =>
+			prev.map((pin) =>
+				pin.id === pin_id ? { ...pin, comment: data.comment } : pin,
+			),
+		);
+
+		setPinDetail((prev) =>
+			prev?.id === pin_id ? { ...prev, comment: data.comment } : prev,
+		);
+
+		setReply("");
+		setInputMode((prev) => ({ ...prev, mode: "normal", to: "reply" }));
+		alert("Pin has been updated successfully");
+	};
+	const editReply = async (reply_id) => {
+		const { data, error } = await supabase
+			.from("replies")
+			.update({
+				text: reply,
+			})
+			.eq("id", reply_id)
+			.select()
+			.single();
+
+		if (error) {
+			console.error(error);
+			return;
+		}
+
+		setReplies((prev) =>
+			prev.map((reply) =>
+				reply.id === reply_id ? { ...reply, text: data.text } : reply,
+			),
+		);
+
+		setReply("");
+		setInputMode((prev) => ({
+			...prev,
+			mode: "normal",
+			to: "reply",
+			idToDelete: null,
+		}));
+		alert("Reply has been updated successfully");
+	};
+
 	return (
 		<div className="wrapper">
 			<PinsSidebar
 				pins={pins}
 				findAuthor={findAuthor}
-				setPinDetail={setPinDetail}
 				zoomRef={zoomRef}
 				roomInfo={roomInfo}
+                showPinDetails={showPinDetails}
 			/>
 			<div className="content">
 				<div className="top">
@@ -598,9 +684,7 @@ export default function RoomClient({ room_id }) {
 																	e,
 																) => {
 																	e.stopPropagation();
-																	setActiveDeleteId(
-																		pin.id,
-																	);
+
 																	showPinDetails(
 																		pin,
 																	);
@@ -617,9 +701,7 @@ export default function RoomClient({ room_id }) {
 																	e,
 																) => {
 																	e.stopPropagation();
-																	setActiveDeleteId(
-																		pin.id,
-																	);
+
 																	showPinDetails(
 																		pin,
 																	);
@@ -721,7 +803,6 @@ export default function RoomClient({ room_id }) {
 										className="close"
 										onClick={() => {
 											setPinDetail(null);
-											setActiveDeleteId(null);
 										}}
 									/>
 									<span>
@@ -738,9 +819,7 @@ export default function RoomClient({ room_id }) {
 									<img
 										src="/icons/trash-2.svg"
 										alt=""
-										onClick={() =>
-											deletePin(activeDeleteId)
-										}
+										onClick={() => deletePin(pinDetail.id)}
 									/>
 								)}
 							</div>
@@ -761,6 +840,14 @@ export default function RoomClient({ room_id }) {
 										<img
 											src="/icons/edit-3.svg"
 											alt=""
+											onClick={() => {
+												setInputMode((prev) => ({
+													...prev,
+													mode: "edit",
+													to: "comment",
+												}));
+												setReply(pinDetail.comment);
+											}}
 										/>
 									)}
 								</div>
@@ -808,6 +895,36 @@ export default function RoomClient({ room_id }) {
 																	reply.created_at,
 																)}
 															</div>
+															{reply.author_id ===
+																currentUser?.id && (
+																<>
+																	<div
+																		className="edit"
+																		onClick={() => {
+																			setInputMode(
+																				(
+																					prev,
+																				) => ({
+																					...prev,
+																					mode: "edit",
+																					to: "reply",
+                                                                                    idToDelete: reply.id
+																				}),
+																			);
+																			setReply(
+																				reply.text,
+																			);
+																		}}
+																	>
+																		Edit
+																	</div>
+																	<img
+																		src="/icons/trash-2.svg"
+																		alt=""
+																		className="delete-reply"
+																	/>
+																</>
+															)}
 														</div>
 													</div>
 												))}
@@ -826,8 +943,23 @@ export default function RoomClient({ room_id }) {
 									value={reply}
 									onChange={(e) => setReply(e.target.value)}
 									onKeyDown={(e) => {
-										if (e.key === "Enter") {
+										if (
+											e.key === "Enter" &&
+											inputMode.mode === "normal"
+										) {
 											addReply(pinDetail);
+										} else if (
+											e.key === "Enter" &&
+											inputMode.mode === "edit" &&
+											inputMode.to === "comment"
+										) {
+											editComment(pinDetail.id);
+										} else if (
+											e.key === "Enter" &&
+											inputMode.mode === "edit" &&
+											inputMode.to === "reply"
+										) {
+											editReply(inputMode.idToDelete);
 										}
 									}}
 								/>

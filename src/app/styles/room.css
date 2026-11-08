@@ -16,8 +16,9 @@ body {
 		width: 100%;
 		background-color: #0a0a0aeb;
 		backdrop-filter: blur(8px);
-        gap: 20px;
-
+		gap: 20px;
+		z-index: 1000000;
+		position: relative;
 
 		.btn {
 			background-color: #262626 !important;
@@ -51,7 +52,7 @@ body {
 				}
 
 				&:hover ~ .members-drop {
-					opacity: 1;
+					display: flex;
 				}
 			}
 
@@ -67,11 +68,10 @@ body {
 				background-color: #121212;
 				border-radius: 15px;
 				border: 1px solid #181818;
-				opacity: 0;
-				transition: 0.2s ease;
-				display: flex;
+
+				display: none;
 				flex-direction: column;
-				z-index: 10000;
+
 				gap: 10px;
 
 				.marker {
@@ -253,7 +253,7 @@ body {
 	transition: 0.2s ease;
 	display: flex;
 	flex-direction: column;
-	z-index: 1000;
+	/* z-index: 1000; */
 	gap: 10px;
 	width: 370px;
 
@@ -266,14 +266,21 @@ body {
 		display: flex;
 		flex-direction: column;
 
-        .comment-card {
-            display: flex;
-            justify-content: space-between;
+		.comment-card {
+			display: flex;
+			justify-content: space-between;
 
-            img  {
-                width: 20px;
-            }
-        }
+			img {
+				width: 20px;
+				opacity: 0.5;
+				transition: 0.3s ease;
+				cursor: pointer;
+
+				&:hover {
+					opacity: 1;
+				}
+			}
+		}
 
 		.replies {
 			display: flex;
@@ -282,6 +289,7 @@ body {
 
 			.reply {
 				background-color: #323232;
+                flex-direction: column;
 
 				.items {
 					display: flex;
@@ -290,9 +298,24 @@ body {
 					gap: 10px;
 					margin-top: 10px;
 
-					.time {
+					.time, .edit {
 						font-size: 0.8em;
 					}
+
+                    .edit {
+                        opacity: 0.4;
+                        transition: 0.3s ease;
+                        cursor: pointer;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+
+                    .delete-reply {
+                        opacity: 1;
+                        width: 20px;
+                    }
 
 					.marker {
 						width: 12px;
@@ -368,13 +391,12 @@ body {
 	background-color: #121212fa;
 	backdrop-filter: blur(9px);
 	border-radius: 15px;
-    height: 100vh;
+	height: 100vh;
 	overflow-y: scroll;
 
 	/* &.active {
 		transform: translateX(0) !important;
 	} */
-
 
 	&::-webkit-scrollbar {
 		width: 5px;
@@ -397,8 +419,8 @@ body {
 		padding: 0 10px;
 		padding: 20px;
 		padding-bottom: 0;
-        backdrop-filter: blur(9px);
-        z-index: 100;
+		backdrop-filter: blur(9px);
+		z-index: 100;
 
 		a {
 			display: flex;
@@ -416,7 +438,6 @@ body {
 			height: 20px;
 			cursor: pointer;
 		}
-
 	}
 
 	.pins {

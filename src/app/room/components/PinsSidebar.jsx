@@ -5,11 +5,11 @@ import { useState } from "react";
 function PinsSidebar({
 	pins,
 	findAuthor,
-	setPinDetail,
 	zoomRef,
 	roomInfo,
+	showPinDetails,
 }) {
-    const [sideBarActive, setSideBarActive] = useState(true);
+	const [sideBarActive, setSideBarActive] = useState(true);
 
 	return (
 		<div className={sideBarActive ? "pins-sidebar active" : "pins-sidebar"}>
@@ -27,7 +27,7 @@ function PinsSidebar({
 						<div
 							className="pin"
 							key={pin.id}
-							onClick={() => setPinDetail(pin)}
+							onClick={() => showPinDetails(pin)}
 						>
 							<div className="up">
 								<div className="name">
