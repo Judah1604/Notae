@@ -50,7 +50,7 @@ export default function RoomClient({ room_id }) {
 	const [replies, setReplies] = useState([]);
 	const [repliesLoading, setRepliesLoading] = useState(false);
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-	const [inputMode, setInputMode] = useState({ mode: "normal", to: "reply", idToDelete: null });
+	const [inputMode, setInputMode] = useState({ mode: "normal", to: "reply", idToEdit: null });
 
 	useEffect(() => {
 		const channel = supabase
@@ -399,6 +399,19 @@ export default function RoomClient({ room_id }) {
 		setPins((prev) => prev.filter((pin) => pin.id !== pinId));
 		setPinDetail(null);
 	};
+	const deleteReply = async (replyId) => {
+		const { error } = await supabase
+			.from("replies")
+			.delete()
+			.eq("id", replyId)
+
+		if (error) {
+			console.error("Error deleting reply:", error);
+			return;
+		}
+
+		setReplies((prev) => prev.filter((reply) => reply.id !== replyId));
+	};
 
 	async function copyLink() {
 		setIsCopying(true);
@@ -577,7 +590,7 @@ export default function RoomClient({ room_id }) {
 			...prev,
 			mode: "normal",
 			to: "reply",
-			idToDelete: null,
+			idToEdit: null,
 		}));
 		alert("Reply has been updated successfully");
 	};
@@ -908,7 +921,7 @@ export default function RoomClient({ room_id }) {
 																					...prev,
 																					mode: "edit",
 																					to: "reply",
-                                                                                    idToDelete: reply.id
+                                                                                    idToEdit: reply.id
 																				}),
 																			);
 																			setReply(
@@ -922,6 +935,7 @@ export default function RoomClient({ room_id }) {
 																		src="/icons/trash-2.svg"
 																		alt=""
 																		className="delete-reply"
+                                                                        onClick={() => deleteReply(reply.id)}
 																	/>
 																</>
 															)}
@@ -959,7 +973,7 @@ export default function RoomClient({ room_id }) {
 											inputMode.mode === "edit" &&
 											inputMode.to === "reply"
 										) {
-											editReply(inputMode.idToDelete);
+											editReply(inputMode.idToEdit);
 										}
 									}}
 								/>
