@@ -70,29 +70,29 @@ body {
 			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
 			background-size: 20px 15px;
 			background-repeat: no-repeat;
-            cursor: pointer;
-            border-radius: 10px;
-            padding: 10px 15px !important;
-            width: 150px;
+			cursor: pointer;
+			border-radius: 10px;
+			padding: 10px 15px !important;
+			width: 150px;
 
-            &:focus {
-                box-shadow: none;
-            }
+			&:focus {
+				box-shadow: none;
+			}
 		}
 
-        .items {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
+		.items {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+		}
 
-        a.btn {
+		a.btn {
 			padding: 10px 15px !important;
 			display: flex;
 			align-items: center;
 			gap: 9px;
-            border-radius: 10px !important;
+			border-radius: 10px !important;
 		}
 	}
 }
@@ -100,7 +100,7 @@ body {
 .rooms {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 20px;
+	gap: 30px;
 	margin-top: 20px;
 
 	.room {
@@ -134,7 +134,7 @@ body {
 			.items {
 				display: flex;
 				align-items: center;
-				gap: 10px;
+				gap: 15px;
 
 				span {
 					opacity: 0.3;
@@ -142,9 +142,46 @@ body {
 			}
 		}
 
-		.deletebtn img {
-			width: 20px;
-			cursor: pointer;
+		.options {
+			position: relative;
+
+			img {
+				padding: 7px 10px;
+				background-color: var(--background);
+				border-radius: 10px;
+				cursor: pointer;
+				transition: 0.3s ease;
+
+				&:hover {
+					background-color: #262626;
+				}
+			}
+
+			.drop {
+				display: none;
+				position: absolute;
+				bottom: 45px;
+				z-index: 10;
+				background-color: var(--background);
+				padding: 7px;
+				border-radius: 20px;
+
+				&.active {
+					display: block;
+				}
+
+				& > * {
+					width: max-content;
+					padding: 10px 15px;
+					cursor: pointer;
+					transition: 0.3s ease;
+					border-radius: 15px;
+
+					&:hover {
+						background-color: #131313;
+					}
+				}
+			}
 		}
 	}
 }
@@ -195,10 +232,10 @@ body {
 		}
 	}
 
-    .items {
-        display: flex;
-        justify-content: space-between;
-    }
+	.items {
+		display: flex;
+		justify-content: space-between;
+	}
 
 	.text {
 		text-align: right;
@@ -218,10 +255,10 @@ body {
 }
 
 .profile {
-    .signout {
-        button {
-            padding: 15px 30px !important;
-            margin-top: 20px;
-        }
-    }
+	.signout {
+		button {
+			padding: 15px 30px !important;
+			margin-top: 20px;
+		}
+	}
 }

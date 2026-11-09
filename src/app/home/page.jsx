@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import "../styles/dashboard.css";
 import Topbar from "../components/Topbar";
-import { timeAgo } from "@/lib/timeAgo";
+import RoomCard from "./components/RoomCard";
+import ConfirmationModal from "./components/ConfirmationModal";
 
 const supabase = createClient();
 function page() {
@@ -18,6 +19,11 @@ function page() {
 		color: "#000000",
 	});
 	const [roomsType, setRoomsType] = useState("all");
+	const [modal, setModal] = useState({
+		type: "leave" || "delete",
+		isActive: false,
+        object: null
+	});
 
 	async function fetchMoreRoomInfo(room) {
 		const [imageResult, membersResult] = await Promise.all([
@@ -205,40 +211,17 @@ function page() {
 				) : (
 					<div className="rooms">
 						{rooms.map((room) => (
-							<div className="room" key={room.id}>
-								<a href={"/room/" + room.id}>
-									<img
-										src={room.imageUrl}
-										alt={room.name}
-										className="display"
-									/>
-								</a>
-								<div className="visitor-count">
-									<img src="/icons/eye.svg" alt="" />
-									{room.membersLen}
-								</div>
-								<div className="info">
-									{room.name}
-									<div className="items">
-										<span>
-											Created {timeAgo(room.created_at)}
-										</span>
-										{room.created_by === user.id && (
-											<div className="deletebtn">
-												<img
-													src="/icons/trash-2.svg"
-													alt=""
-													title="Delete Room"
-												/>
-											</div>
-										)}
-									</div>
-								</div>
-							</div>
+							<RoomCard
+								room={room}
+								user={user}
+								key={room.id}
+								setModal={setModal}
+							/>
 						))}
 					</div>
 				)}
 			</div>
+			<ConfirmationModal modal={modal} setModal={setModal} />
 		</div>
 	);
 }

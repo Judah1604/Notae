@@ -27,6 +27,7 @@ export default function RoomClient({ room_id }) {
 	const [activeUsers, setActiveUsers] = useState([]);
 	const [notifications, setNotifications] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [isMember, setIsMember] = useState(null);
 	const commentRef = useRef(null);
 	const zoomRef = useRef(null);
 	const defaultPin = {
@@ -320,35 +321,16 @@ export default function RoomClient({ room_id }) {
 			const isMember = members.some((m) => m.id === user.id);
 
 			if (!isMember) {
-				const { error: insertError } = await supabase
-					.from("room_members")
-					.insert({
-						room_id,
-						user_id: user.id,
-					});
-
-				if (insertError) {
-					console.error("Membership creation failed:", insertError);
-					return;
-				}
-
-				// Fetch again so the newly added member is included.
-				const { data: refreshed, error: refreshError } = await supabase
-					.from("room_members")
-					.select("user_id, profiles(display_name, color)")
-					.eq("room_id", room_id);
-
-				if (refreshError) {
-					console.error("Members refresh failed:", refreshError);
-					return;
-				}
-
-				members = refreshed.map((m) => ({
-					id: m.user_id,
-					name: m.profiles?.display_name,
-					color: m.profiles?.color,
+				setRoomInfo((prev) => ({
+					...prev,
+					members,
 				}));
+
+				setIsMember(false);
+				return;
 			}
+            
+			setIsMember(true);
 
 			const { data: creator, error: creatorErr } = await supabase
 				.from("rooms")
@@ -1073,7 +1055,7 @@ export default function RoomClient({ room_id }) {
 							currentUser={currentUser}
 							shareModalActive={shareModalActive}
 							setShareModalActive={setShareModalActive}
-                            activeUsers={activeUsers}
+							activeUsers={activeUsers}
 						/>
 					</>
 				)}
