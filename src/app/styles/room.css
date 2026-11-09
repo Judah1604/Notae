@@ -645,9 +645,13 @@ body {
 			flex-wrap: wrap;
 
 			.marker {
-				width: 10px;
-				height: 10px;
+				width: 15px;
+				height: 15px;
 				border-radius: 100px;
+
+                &.online {
+                    border: 2px solid white;
+                }
 			}
 
 			.creator {

@@ -6,6 +6,7 @@ function ShareModal({
 	currentUser,
 	shareModalActive,
 	setShareModalActive,
+	activeUsers,
 }) {
 	const [isCopying, setIsCopying] = useState(false);
 	const currentUrl = window.location.href;
@@ -19,6 +20,13 @@ function ShareModal({
 		} finally {
 			setIsCopying(false);
 		}
+	}
+
+	function isOnline(userId) {
+		const bool = activeUsers.some((member) => member.id === userId),
+			className = bool ? "marker online" : "marker";
+
+		return className;
 	}
 
 	return (
@@ -41,7 +49,7 @@ function ShareModal({
 							src="/icons/x.svg"
 							alt=""
 							className="close-modal"
-                            onClick={() => setShareModalActive(false)}
+							onClick={() => setShareModalActive(false)}
 						/>
 					</div>
 				</div>
@@ -49,7 +57,7 @@ function ShareModal({
 					{roomInfo.members.map((user) => (
 						<div className="item" key={user.id}>
 							<div
-								className="marker"
+								className={isOnline(user.id)}
 								style={{
 									backgroundColor: user.color,
 								}}

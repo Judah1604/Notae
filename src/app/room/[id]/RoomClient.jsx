@@ -1073,6 +1073,7 @@ export default function RoomClient({ room_id }) {
 							currentUser={currentUser}
 							shareModalActive={shareModalActive}
 							setShareModalActive={setShareModalActive}
+                            activeUsers={activeUsers}
 						/>
 					</>
 				)}
