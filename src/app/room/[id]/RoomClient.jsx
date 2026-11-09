@@ -23,6 +23,8 @@ export default function RoomClient({ room_id }) {
 		creator_id: null,
 		members: [],
 	});
+	const [activeUsers, setActiveUsers] = useState([]);
+	const [notifications, setNotifications] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const commentRef = useRef(null);
 	const zoomRef = useRef(null);
@@ -50,8 +52,91 @@ export default function RoomClient({ room_id }) {
 	const [replies, setReplies] = useState([]);
 	const [repliesLoading, setRepliesLoading] = useState(false);
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-	const [inputMode, setInputMode] = useState({ mode: "normal", to: "reply", idToEdit: null });
+	const [inputMode, setInputMode] = useState({
+		mode: "normal",
+		to: "reply",
+		idToEdit: null,
+	});
 
+	const notify = (message, type, subject) => {
+		setNotifications((prev) => {
+			const lastnotif = prev[prev.length - 1];
+
+			if (lastnotif?.subject === subject && lastnotif?.type === type) {
+				return prev;
+			}
+
+			const id = crypto.randomUUID();
+
+			setTimeout(() => {
+				setNotifications((items) =>
+					items.filter((item) => item.id !== id),
+				);
+			}, 3000);
+
+			return [...prev, { id, message, type, subject }];
+		});
+	};
+
+	useEffect(() => {
+		if (!room_id || !currentUser?.id || !roomInfo?.members) return;
+
+		const channel = supabase.channel(`room-presence-${room_id}`, {
+			config: {
+				presence: {
+					key: currentUser.id,
+				},
+			},
+		});
+
+		channel
+			.on("presence", { event: "sync" }, () => {
+				const state = channel.presenceState();
+
+				const users = Object.values(state).flat();
+
+				const onlineMembers = roomInfo.members.filter((member) =>
+					users.some((user) => user.user_id === member.id),
+				);
+				setActiveUsers(onlineMembers);
+			})
+			.on("presence", { event: "join" }, ({ newPresences }) => {
+				// console.log("Joined:", newPresences);
+
+				const joinedMember = roomInfo.members.filter((member) =>
+					newPresences.some((user) => user.user_id === member.id),
+				);
+				notify(
+					`${joinedMember[0].name} joined the room`,
+					"join",
+					joinedMember[0].name,
+				);
+			})
+			.on("presence", { event: "leave" }, ({ leftPresences }) => {
+				// console.log("Left:", leftPresences);
+
+				const leftMember = roomInfo.members.filter((member) =>
+					leftPresences.some((user) => user.user_id === member.id),
+				);
+				notify(
+					`${leftMember[0].name} joined the room`,
+					"leave",
+					leftMember[0].name,
+				);
+			})
+			.subscribe(async (status) => {
+				if (status === "SUBSCRIBED") {
+					await channel.track({
+						user_id: currentUser.id,
+						online_at: new Date().toISOString(),
+					});
+				}
+			});
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
+	}, [room_id, currentUser?.id]);
 	useEffect(() => {
 		const channel = supabase
 			.channel(`room-${room_id}-pins`)
@@ -325,6 +410,7 @@ export default function RoomClient({ room_id }) {
 				await fetchRoomImage();
 				await loadMembers();
 				await fetchPins();
+				console.log(activeUsers);
 			} finally {
 				setIsLoading(false);
 			}
@@ -403,7 +489,7 @@ export default function RoomClient({ room_id }) {
 		const { error } = await supabase
 			.from("replies")
 			.delete()
-			.eq("id", replyId)
+			.eq("id", replyId);
 
 		if (error) {
 			console.error("Error deleting reply:", error);
@@ -602,12 +688,12 @@ export default function RoomClient({ room_id }) {
 				findAuthor={findAuthor}
 				zoomRef={zoomRef}
 				roomInfo={roomInfo}
-                showPinDetails={showPinDetails}
+				showPinDetails={showPinDetails}
 			/>
 			<div className="content">
 				<div className="top">
 					<div className="members">
-						{roomInfo.members.map((user) => (
+						{activeUsers.map((user) => (
 							<div
 								key={user.id}
 								className="marker"
@@ -615,12 +701,12 @@ export default function RoomClient({ room_id }) {
 							></div>
 						))}
 						<div className="count">
-							{roomInfo.members.length > 3
-								? `+${roomInfo.members.length - 3}`
+							{activeUsers.length > 3
+								? `+${activeUsers.length - 3}`
 								: ""}
 						</div>
 						<div className="members-drop">
-							{roomInfo.members.map((user) => (
+							{activeUsers.map((user) => (
 								<div className="item" key={user.id}>
 									<div
 										className="marker"
@@ -803,6 +889,16 @@ export default function RoomClient({ room_id }) {
 								/>
 							</div>
 						</div>
+						<div className="notifications">
+							{notifications.map((notification) => (
+								<div
+									className="notification"
+									key={notification.id}
+								>
+									{notification.message}
+								</div>
+							))}
+						</div>
 						<div
 							className={
 								pinDetail ? "pin-details active" : "pin-details"
@@ -921,7 +1017,8 @@ export default function RoomClient({ room_id }) {
 																					...prev,
 																					mode: "edit",
 																					to: "reply",
-                                                                                    idToEdit: reply.id
+																					idToEdit:
+																						reply.id,
 																				}),
 																			);
 																			setReply(
@@ -935,7 +1032,11 @@ export default function RoomClient({ room_id }) {
 																		src="/icons/trash-2.svg"
 																		alt=""
 																		className="delete-reply"
-                                                                        onClick={() => deleteReply(reply.id)}
+																		onClick={() =>
+																			deleteReply(
+																				reply.id,
+																			)
+																		}
 																	/>
 																</>
 															)}

@@ -387,10 +387,15 @@ body {
 	}
 }
 
+.notifications {
+    position: absolute;
+    bottom: 40px;
+    right: 10px;
+}
+
 .pins-sidebar {
 	background-color: #121212fa;
 	backdrop-filter: blur(9px);
-	border-radius: 15px;
 	height: 100vh;
 	overflow-y: scroll;
 
