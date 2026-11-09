@@ -119,7 +119,7 @@ export default function RoomClient({ room_id }) {
 					leftPresences.some((user) => user.user_id === member.id),
 				);
 				notify(
-					`${leftMember[0].name} joined the room`,
+					`${leftMember[0].name} left the room`,
 					"leave",
 					leftMember[0].name,
 				);

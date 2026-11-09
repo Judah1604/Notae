@@ -7,6 +7,7 @@ body {
 .wrapper {
 	display: grid;
 	grid-template-columns: 1.2fr 3fr;
+    transition: grid-template-columns 350ms cubic-bezier(0.22, 1, 0.36, 1);
 
 	.top {
 		display: flex;
@@ -253,7 +254,7 @@ body {
 	transition: 0.2s ease;
 	display: flex;
 	flex-direction: column;
-	/* z-index: 1000; */
+	/* z-index: 2; */
 	gap: 10px;
 	width: 370px;
 
@@ -289,7 +290,7 @@ body {
 
 			.reply {
 				background-color: #323232;
-                flex-direction: column;
+				flex-direction: column;
 
 				.items {
 					display: flex;
@@ -298,24 +299,25 @@ body {
 					gap: 10px;
 					margin-top: 10px;
 
-					.time, .edit {
+					.time,
+					.edit {
 						font-size: 0.8em;
 					}
 
-                    .edit {
-                        opacity: 0.4;
-                        transition: 0.3s ease;
-                        cursor: pointer;
+					.edit {
+						opacity: 0.4;
+						transition: 0.3s ease;
+						cursor: pointer;
 
-                        &:hover {
-                            opacity: 1;
-                        }
-                    }
+						&:hover {
+							opacity: 1;
+						}
+					}
 
-                    .delete-reply {
-                        opacity: 1;
-                        width: 20px;
-                    }
+					.delete-reply {
+						opacity: 1;
+						width: 20px;
+					}
 
 					.marker {
 						width: 12px;
@@ -388,9 +390,9 @@ body {
 }
 
 .notifications {
-    position: absolute;
-    bottom: 40px;
-    right: 10px;
+	position: absolute;
+	bottom: 40px;
+	right: 10px;
 }
 
 .pins-sidebar {
@@ -398,6 +400,16 @@ body {
 	backdrop-filter: blur(9px);
 	height: 100vh;
 	overflow-y: scroll;
+	position: relative;
+	z-index: 2;
+
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+			opacity 200ms ease;
+
+.sidebar-wrap.active & {
+	transform: translateX(-100%);
+	opacity: 0;
+}
 
 	/* &.active {
 		transform: translateX(0) !important;
@@ -416,12 +428,11 @@ body {
 		display: flex;
 		justify-content: start;
 		align-items: center;
+		gap: 30px;
 		margin-bottom: 10px;
 		position: sticky;
 		top: 0;
 		background-color: #121212fa;
-		gap: 10px;
-		padding: 0 10px;
 		padding: 20px;
 		padding-bottom: 0;
 		backdrop-filter: blur(9px);
@@ -436,6 +447,10 @@ body {
 			&:hover {
 				opacity: 1;
 			}
+		}
+
+		h3 {
+			margin: 0;
 		}
 
 		img {
@@ -535,4 +550,42 @@ body {
 	to {
 		stroke-dashoffset: 0;
 	}
+}
+
+.sidebar-wrap {
+	position: relative;
+	padding-right: 40px;
+	transition: 0.3s ease;
+
+	&.active {
+        width: 10px;
+	}
+}
+
+.expand {
+	z-index: 1;
+	background-color: #262626;
+	padding: 7px;
+	position: absolute;
+	top: 10px;
+	right: 0px;
+	border-radius: 10px;
+	padding-left: 30px;
+	display: flex;
+	cursor: pointer;
+
+	img {
+		transform: rotate(180deg);
+		transition: 0.3s ease;
+	}
+
+	&.active {
+		img {
+			transform: none;
+		}
+	}
+}
+
+.wrapper:has(.sidebar-wrap.active) {
+	grid-template-columns: 0fr 3fr;
 }
