@@ -10,6 +10,7 @@ import { TransformComponent } from "react-zoom-pan-pinch";
 import { TransformWrapper } from "react-zoom-pan-pinch";
 import { formatTime } from "@/lib/timeAgo";
 import PinsSidebar from "../components/PinsSidebar";
+import ShareModal from "../components/ShareModal";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -47,16 +48,16 @@ export default function RoomClient({ room_id }) {
 				},
 			]
 		: pins;
-	const [isCopying, setIsCopying] = useState(false);
+
 	const [reply, setReply] = useState("");
 	const [replies, setReplies] = useState([]);
 	const [repliesLoading, setRepliesLoading] = useState(false);
-	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	const [inputMode, setInputMode] = useState({
 		mode: "normal",
 		to: "reply",
 		idToEdit: null,
 	});
+	const [shareModalActive, setShareModalActive] = useState(false);
 
 	const notify = (message, type, subject) => {
 		setNotifications((prev) => {
@@ -499,17 +500,6 @@ export default function RoomClient({ room_id }) {
 		setReplies((prev) => prev.filter((reply) => reply.id !== replyId));
 	};
 
-	async function copyLink() {
-		setIsCopying(true);
-		try {
-			const currentUrl = window.location.href;
-			navigator.clipboard.writeText(currentUrl);
-			await delay(3000);
-		} finally {
-			setIsCopying(false);
-		}
-	}
-
 	const handleSubmit = async () => {
 		if (!comment.trim()) {
 			alert("Please type in a comment!");
@@ -726,13 +716,11 @@ export default function RoomClient({ room_id }) {
 							))}
 						</div>
 					</div>
-					<button className="btn" onClick={copyLink}>
-						<img src="/icons/link.svg" alt="" />
-						{isCopying ? (
-							<span>Copied</span>
-						) : (
-							<span>Copy Link</span>
-						)}
+					<button
+						className="btn"
+						onClick={() => setShareModalActive(true)}
+					>
+						Share
 					</button>
 				</div>
 				<div className="disclaimer">
@@ -1080,6 +1068,12 @@ export default function RoomClient({ room_id }) {
 								/>
 							</div>
 						</div>
+						<ShareModal
+							roomInfo={roomInfo}
+							currentUser={currentUser}
+							shareModalActive={shareModalActive}
+							setShareModalActive={setShareModalActive}
+						/>
 					</>
 				)}
 			</div>

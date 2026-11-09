@@ -16,7 +16,7 @@ function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
 				</div>
 				<div className="pins">
 					{pins.length === 0 ? (
-						<p className="text-center">No pins to show yet</p>
+						<p className="text-center mt-3">No pins to show yet</p>
 					) : (
 						pins.map((pin) => (
 							<div
