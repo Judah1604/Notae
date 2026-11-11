@@ -19,6 +19,10 @@ function page() {
 		const result = await loginAction(formData);
 		if (result.error) {
 			setError(result.error);
+
+			if (result.error === "Invalid Username or Password") {
+				setFormData((prev) => ({ ...prev, password: "" }));
+			}
 			console.error("Login error:", result.error);
 		}
 	};

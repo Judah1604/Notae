@@ -12,11 +12,21 @@ export const loginAction = async (formData) => {
 	});
 
 	// console.log("Login data:", data);
-	// console.log("Login error:", error);
+	console.log("Login error:", error);
+
+	if (error) {
+		console.error(error);
+		return {
+			error:
+				error.code === "invalid_credentials"
+					? "Invalid Username or Password"
+					: "Login failed. Please try again.",
+		};
+	} else if (!data.session) {
+		return { error: "Login failed. Please try again." };
+	}
 
 	if (data.session) {
 		redirect("/home");
-	} else if (!data.session || error) {
-        return { error: "Login failed. Please try again." };
-    }
+	}
 };
