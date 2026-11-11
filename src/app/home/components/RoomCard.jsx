@@ -33,7 +33,7 @@ function RoomCard({ room, user, setModal }) {
 											...prev,
 											type: "delete",
 											isActive: true,
-											object: room,
+											object: {room, user},
 										}))
 									}
 								>
@@ -48,7 +48,7 @@ function RoomCard({ room, user, setModal }) {
 											...prev,
 											type: "leave",
 											isActive: true,
-											object: room,
+											object: {room, user},
 										}))
 									}
 								>

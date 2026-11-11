@@ -1,6 +1,12 @@
-import React from "react";
+import DeleteContent from "./DeleteContent";
+import LeaveContent from "./LeaveContent";
 
-function ConfirmationModal({ modal, setModal }) {
+function ConfirmationModal({ modal, setModal, supabase }) {
+	if (!modal?.object?.room && !modal?.object?.user) return null;
+
+	const room = modal?.object?.room,
+		user = modal?.object?.user;
+
 	return (
 		<div
 			className={
@@ -17,9 +23,21 @@ function ConfirmationModal({ modal, setModal }) {
 			></div>
 			<div className="dialog">
 				{modal.type === "leave" ? (
-					<LeaveContent modal={modal} setModal={setModal} />
+					<LeaveContent
+						modal={modal}
+						setModal={setModal}
+						user={user}
+						room={room}
+						supabase={supabase}
+					/>
 				) : modal.type === "delete" ? (
-					<DeleteContent modal={modal} setModal={setModal} />
+					<DeleteContent
+						modal={modal}
+						setModal={setModal}
+						user={user}
+						room={room}
+						supabase={supabase}
+					/>
 				) : (
 					""
 				)}
@@ -29,40 +47,3 @@ function ConfirmationModal({ modal, setModal }) {
 }
 
 export default ConfirmationModal;
-
-function LeaveContent({ modal, setModal }) {
-	return (
-		<div className="content">
-			<h2>Are you sure you want to leave {modal?.object.name}</h2>
-			<div className="btns">
-				<button
-					className="btn"
-					onClick={() =>
-						setModal((prev) => ({ ...prev, isActive: false }))
-					}
-				>
-					Cancel and Close
-				</button>
-				<button className="btn">Leave Room</button>
-			</div>
-		</div>
-	);
-}
-function DeleteContent({ modal, setModal }) {
-	return (
-		<div className="content">
-			<h2>Are you sure you want to delete {modal?.object.name}</h2>
-			<div className="btns">
-				<button
-					className="btn"
-					onClick={() =>
-						setModal((prev) => ({ ...prev, isActive: false }))
-					}
-				>
-					Cancel and Close
-				</button>
-				<button className="btn">Delete Room</button>
-			</div>
-		</div>
-	);
-}

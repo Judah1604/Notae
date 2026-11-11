@@ -73,7 +73,7 @@ textarea {
 button, a.btn {
 	background-color: white !important;
 	color: #262626 !important;
-	padding: 14px !important;
+	padding: 10px 20px !important;
 	border: none;
 	border-radius: 15px !important;
 
@@ -116,9 +116,27 @@ button, a.btn {
 	.dialog {
 		z-index: 10000000000;
 		background-color: #181818;
-		padding: 30px;
+		padding: 40px;
 		border-radius: 20px;
 		width: 700px;
+
+        .content  {
+            text-align: center;
+            h2 {
+                margin-bottom: 30px;
+                span {
+                    font-weight: 700;
+                }
+            }
+
+            .btns {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+
+               
+            }
+        }
 
 		.copy {
 			display: flex;
@@ -166,7 +184,7 @@ button, a.btn {
 		}
 	}
 
-	.btn {
+	.btn.secondary {
 		background-color: #262626 !important;
 		color: white !important;
 

@@ -221,7 +221,11 @@ function page() {
 					</div>
 				)}
 			</div>
-			<ConfirmationModal modal={modal} setModal={setModal} />
+			<ConfirmationModal
+				modal={modal}
+				setModal={setModal}
+				supabase={supabase}
+			/>
 		</div>
 	);
 }

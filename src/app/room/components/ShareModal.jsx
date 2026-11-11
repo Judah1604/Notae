@@ -41,7 +41,7 @@ function ShareModal({
 				<div className="copy">
 					<h2>Room Information</h2>
 					<div className="items">
-						<button className="copyLink btn" onClick={copyLink}>
+						<button className="copyLink btn secondary" onClick={copyLink}>
 							<img src="/icons/link.svg" alt="" />
 							{isCopying ? "Copied" : "Copy Link"}
 						</button>
