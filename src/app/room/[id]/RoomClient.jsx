@@ -11,6 +11,7 @@ import { TransformWrapper } from "react-zoom-pan-pinch";
 import { formatTime } from "@/lib/timeAgo";
 import PinsSidebar from "../components/PinsSidebar";
 import ShareModal from "../components/ShareModal";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -59,6 +60,7 @@ export default function RoomClient({ room_id }) {
 		idToEdit: null,
 	});
 	const [shareModalActive, setShareModalActive] = useState(false);
+    const router = useRouter();
 
 	const notify = (message, type, subject) => {
 		setNotifications((prev) => {
@@ -327,7 +329,7 @@ export default function RoomClient({ room_id }) {
 				}));
 
 				setIsMember(false);
-				return;
+                router.push('/join-room/' + room_id)
 			}
             
 			setIsMember(true);

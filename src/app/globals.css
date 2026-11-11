@@ -86,6 +86,23 @@ button, a.btn {
 		background-color: white !important;
 		color: #262626 !important;
 	}
+
+    &.secondary {
+		background-color: #262626 !important;
+		color: white !important;
+
+		padding: 10px 20px !important;
+
+		&:hover {
+			background-color: #323232 !important;
+            color: white !important;
+		}
+
+		img {
+			width: 20px;
+			margin-right: 10px;
+		}
+	}
 }
 
 .share-modal, .confirmation-modal {
@@ -133,7 +150,6 @@ button, a.btn {
                 display: flex;
                 justify-content: center;
                 gap: 10px;
-
                
             }
         }
@@ -181,23 +197,6 @@ button, a.btn {
 				align-items: center;
 				gap: 7px;
 			}
-		}
-	}
-
-	.btn.secondary {
-		background-color: #262626 !important;
-		color: white !important;
-
-		padding: 10px 20px !important;
-
-		&:hover {
-			background-color: #323232 !important;
-            color: white !important;
-		}
-
-		img {
-			width: 20px;
-			margin-right: 10px;
 		}
 	}
 }
