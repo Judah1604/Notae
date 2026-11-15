@@ -29,7 +29,6 @@ export default function RoomClient({ room_id }) {
 	const [notifications, setNotifications] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isMember, setIsMember] = useState(null);
-	const commentRef = useRef(null);
 	const zoomRef = useRef(null);
 	const defaultPin = {
 		x: 0,
@@ -55,12 +54,12 @@ export default function RoomClient({ room_id }) {
 	const [replies, setReplies] = useState([]);
 	const [repliesLoading, setRepliesLoading] = useState(false);
 	const [inputMode, setInputMode] = useState({
-		mode: "normal",
+		mode: "create",
 		to: "reply",
 		idToEdit: null,
 	});
 	const [shareModalActive, setShareModalActive] = useState(false);
-    const router = useRouter();
+	const router = useRouter();
 
 	const notify = (message, type, subject) => {
 		setNotifications((prev) => {
@@ -329,9 +328,9 @@ export default function RoomClient({ room_id }) {
 				}));
 
 				setIsMember(false);
-                router.push('/join-room/' + room_id)
+				router.push("/join-room/" + room_id);
 			}
-            
+
 			setIsMember(true);
 
 			const { data: creator, error: creatorErr } = await supabase
@@ -428,6 +427,9 @@ export default function RoomClient({ room_id }) {
 	}
 
 	function handleImageClick(e) {
+		if (pinDetail) return;
+
+		setInputMode((prev) => ({ ...prev, mode: "create", to: "comment" }));
 		const MIN_DISTANCE = 0.04;
 		const rect = e.currentTarget.getBoundingClientRect();
 
@@ -444,14 +446,20 @@ export default function RoomClient({ room_id }) {
 		const markerType = Math.random() < 0.5 ? "x" : "scribble";
 
 		if (!tooClose) {
-			setActivePin({
+			const newPin = {
 				...defaultPin,
+				id: Math.floor(Math.random() * 100000000),
 				x,
 				y,
 				markerType,
-			});
-			setCommentActive(true);
-			commentRef.current?.focus();
+				authorId: currentUser?.id,
+				comment,
+				created_at: Date.now(),
+				replyCount: 0,
+			};
+			setPins((prev) => [newPin, ...prev]);
+			setActivePin(newPin);
+			setPinDetail(newPin);
 		}
 	}
 
@@ -484,7 +492,7 @@ export default function RoomClient({ room_id }) {
 		setReplies((prev) => prev.filter((reply) => reply.id !== replyId));
 	};
 
-	const handleSubmit = async () => {
+	const addComment = async () => {
 		if (!comment.trim()) {
 			alert("Please type in a comment!");
 			return;
@@ -542,6 +550,8 @@ export default function RoomClient({ room_id }) {
 		setActivePin(defaultPin);
 		setComment("");
 		setCommentActive(false);
+		setInputMode((prev) => ({ ...prev, mode: "create", to: "reply" }));
+		setPins((prev) => prev.filter((pin) => pin.id !== activePin?.id));
 	};
 
 	const showPinDetails = async (pin) => {
@@ -621,7 +631,7 @@ export default function RoomClient({ room_id }) {
 		);
 
 		setReply("");
-		setInputMode((prev) => ({ ...prev, mode: "normal", to: "reply" }));
+		setInputMode((prev) => ({ ...prev, mode: "create", to: "reply" }));
 		alert("Pin has been updated successfully");
 	};
 	const editReply = async (reply_id) => {
@@ -648,7 +658,7 @@ export default function RoomClient({ room_id }) {
 		setReply("");
 		setInputMode((prev) => ({
 			...prev,
-			mode: "normal",
+			mode: "create",
 			to: "reply",
 			idToEdit: null,
 		}));
@@ -824,43 +834,6 @@ export default function RoomClient({ room_id }) {
 								);
 							}}
 						</TransformWrapper>
-						<div
-							className={
-								commentActive
-									? "comment-input active"
-									: "comment-input"
-							}
-						>
-							<input
-								type="text"
-								className="form-control"
-								placeholder="Enter your comment"
-								value={comment}
-								onChange={(e) => setComment(e.target.value)}
-								onKeyDown={(e) => {
-									if (e.key === "Enter") {
-										handleSubmit();
-									} else if (e.key === "Escape") {
-										handleClose();
-									}
-								}}
-								ref={commentRef}
-							/>
-							<div className="btns">
-								<img
-									src="/icons/x.svg"
-									alt="x"
-									className="close"
-									onClick={handleClose}
-								/>
-								<img
-									src="/icons/arrow-up.svg"
-									alt="arrow-up"
-									className="submit"
-									onClick={handleSubmit}
-								/>
-							</div>
-						</div>
 						<div className="notifications">
 							{notifications.map((notification) => (
 								<div
@@ -884,6 +857,7 @@ export default function RoomClient({ room_id }) {
 										className="close"
 										onClick={() => {
 											setPinDetail(null);
+											handleClose();
 										}}
 									/>
 									<span>
@@ -915,7 +889,13 @@ export default function RoomClient({ room_id }) {
 										),
 									}}
 								>
-									{pinDetail?.comment}
+									<span>
+										{inputMode.mode === "create" &&
+										inputMode.to === "comment"
+											? comment
+											: pinDetail?.comment}
+									</span>
+
 									{pinDetail?.authorId ===
 										currentUser?.id && (
 										<img
@@ -1020,21 +1000,45 @@ export default function RoomClient({ room_id }) {
 									</div>
 								)}
 							</div>
-							<div className="disclaimer">Enter to send</div>
+							<div className="disclaimer">
+								Enter to send Esc to cancel
+							</div>
 
 							<div className="input">
 								<input
 									type="text"
 									className="form-control"
-									placeholder="Enter your reply"
-									value={reply}
-									onChange={(e) => setReply(e.target.value)}
+									placeholder={
+										inputMode.mode === "create" &&
+										inputMode.to === "comment"
+											? "Enter your comment"
+											: "Enter your reply"
+									}
+									value={
+										inputMode.mode === "create" &&
+										inputMode.to === "comment"
+											? comment
+											: reply
+									}
+									onChange={(e) => {
+										inputMode.mode === "create" &&
+										inputMode.to === "comment"
+											? setComment(e.target.value)
+											: setReply(e.target.value);
+									}}
 									onKeyDown={(e) => {
 										if (
 											e.key === "Enter" &&
-											inputMode.mode === "normal"
+											inputMode.mode === "create" &&
+											inputMode.mode === "reply"
 										) {
 											addReply(pinDetail);
+										} else if (
+											e.key === "Enter" &&
+											inputMode.mode === "create" &&
+											inputMode.to === "comment"
+										) {
+											addComment(pinDetail.id);
 										} else if (
 											e.key === "Enter" &&
 											inputMode.mode === "edit" &&
@@ -1047,6 +1051,14 @@ export default function RoomClient({ room_id }) {
 											inputMode.to === "reply"
 										) {
 											editReply(inputMode.idToEdit);
+										} else if (e.key === "Escape") {
+											setPinDetail(null);
+											if (
+												inputMode.mode === "create" &&
+												inputMode.to === "comment"
+											) {
+												handleClose();
+											}
 										}
 									}}
 								/>
