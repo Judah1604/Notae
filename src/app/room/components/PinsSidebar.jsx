@@ -39,7 +39,11 @@ function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
 										{formatTime(pin.created_at)}
 									</div>
 								</div>
-								<div className="comment">{pin.comment}</div>
+								<div className="comment">
+									{pin.comment === ""
+										? "Enter your comment"
+										: pin.comment}
+								</div>
 								<div className="bottom">
 									<div className="reply-count">
 										{pin.replyCount === 0
@@ -66,7 +70,10 @@ function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
 					)}
 				</div>
 			</div>
-			<div className={sideBarActive ? "expand active" : 'expand'} onClick={() => setSideBarActive(!sideBarActive)}>
+			<div
+				className={sideBarActive ? "expand active" : "expand"}
+				onClick={() => setSideBarActive(!sideBarActive)}
+			>
 				<img src="/icons/arrow-right.svg" alt="" />
 			</div>
 		</div>

@@ -160,7 +160,7 @@ body {
 					overflow-wrap: break-word;
 					white-space: normal;
 					box-sizing: border-box;
-                    z-index: 100;
+                    z-index: 1000;
 
 					.username {
 						font-size: 0.8em;

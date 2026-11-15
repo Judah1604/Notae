@@ -60,6 +60,8 @@ export default function RoomClient({ room_id }) {
 	});
 	const [shareModalActive, setShareModalActive] = useState(false);
 	const router = useRouter();
+    const commentRef = useRef(null)
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 	const notify = (message, type, subject) => {
 		setNotifications((prev) => {
@@ -155,22 +157,32 @@ export default function RoomClient({ room_id }) {
 					const newPin = payload.new;
 
 					setPins((prev) => {
-						// Prevent duplicate pins
-						if (prev.some((pin) => pin.id === newPin.id)) {
-							return prev;
+						const savedPin = {
+							id: newPin.id,
+							x: newPin.x,
+							y: newPin.y,
+							authorId: newPin.author_id,
+							markerType: newPin.marker_type,
+							comment: newPin.comment,
+							created_at: newPin.created_at,
+							replyCount: 0,
+						};
+
+						const exists = prev.some((pin) => pin.id === newPin.id);
+
+						if (exists) {
+							return prev.map((pin) =>
+								pin.id === newPin.id
+									? {
+											...pin,
+											...savedPin,
+											replyCount: pin.replyCount ?? 0,
+										}
+									: pin,
+							);
 						}
 
-						return [
-							...prev,
-							{
-								id: newPin.id,
-								x: newPin.x,
-								y: newPin.y,
-								authorId: newPin.author_id,
-								markerType: newPin.marker_type,
-								comment: newPin.comment,
-							},
-						];
+						return [savedPin, ...prev];
 					});
 				},
 			)
@@ -426,7 +438,7 @@ export default function RoomClient({ room_id }) {
 		return author;
 	}
 
-	function handleImageClick(e) {
+	async function handleImageClick(e) {
 		if (pinDetail) return;
 
 		setInputMode((prev) => ({ ...prev, mode: "create", to: "comment" }));
@@ -448,7 +460,7 @@ export default function RoomClient({ room_id }) {
 		if (!tooClose) {
 			const newPin = {
 				...defaultPin,
-				id: Math.floor(Math.random() * 100000000),
+				id: crypto.randomUUID(),
 				x,
 				y,
 				markerType,
@@ -460,6 +472,8 @@ export default function RoomClient({ room_id }) {
 			setPins((prev) => [newPin, ...prev]);
 			setActivePin(newPin);
 			setPinDetail(newPin);
+            await delay(700);
+            commentRef?.current.focus()
 		}
 	}
 
@@ -501,6 +515,7 @@ export default function RoomClient({ room_id }) {
 		const { data, error } = await supabase
 			.from("pins")
 			.insert({
+				id: activePin.id,
 				room_id,
 				author_id: currentUser.id,
 				x: activePin.x,
@@ -541,10 +556,18 @@ export default function RoomClient({ room_id }) {
 			replyCount: replyCounts[data.id] || 0,
 		};
 
-		setPins((prev) => [savedPin, ...prev]);
+		setPins((prev) =>
+			prev.some((p) => p.id === savedPin.id)
+				? prev.map((p) =>
+						p.id === savedPin.id ? { ...p, ...savedPin } : p,
+					)
+				: [savedPin, ...prev],
+		);
 		setActivePin(defaultPin);
+		setInputMode((prev) => ({ ...prev, mode: "create", to: "reply" }));
 		setComment("");
 		setCommentActive(false);
+		setPinDetail(null);
 	};
 	const handleClose = () => {
 		setActivePin(defaultPin);
@@ -1008,6 +1031,7 @@ export default function RoomClient({ room_id }) {
 								<input
 									type="text"
 									className="form-control"
+                                    ref={commentRef}
 									placeholder={
 										inputMode.mode === "create" &&
 										inputMode.to === "comment"
@@ -1030,7 +1054,7 @@ export default function RoomClient({ room_id }) {
 										if (
 											e.key === "Enter" &&
 											inputMode.mode === "create" &&
-											inputMode.mode === "reply"
+											inputMode.to === "reply"
 										) {
 											addReply(pinDetail);
 										} else if (
@@ -1070,6 +1094,7 @@ export default function RoomClient({ room_id }) {
 							shareModalActive={shareModalActive}
 							setShareModalActive={setShareModalActive}
 							activeUsers={activeUsers}
+                            delay={delay}
 						/>
 					</>
 				)}
