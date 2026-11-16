@@ -59,9 +59,10 @@ export default function RoomClient({ room_id }) {
 		idToEdit: null,
 	});
 	const [shareModalActive, setShareModalActive] = useState(false);
+	const [showPins, setShowPins] = useState(true);
 	const router = useRouter();
-    const commentRef = useRef(null)
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+	const commentRef = useRef(null);
+	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 	const notify = (message, type, subject) => {
 		setNotifications((prev) => {
@@ -472,8 +473,8 @@ export default function RoomClient({ room_id }) {
 			setPins((prev) => [newPin, ...prev]);
 			setActivePin(newPin);
 			setPinDetail(newPin);
-            await delay(700);
-            commentRef?.current.focus()
+			await delay(700);
+			commentRef?.current.focus();
 		}
 	}
 
@@ -733,12 +734,27 @@ export default function RoomClient({ room_id }) {
 							))}
 						</div>
 					</div>
-					<button
-						className="btn"
-						onClick={() => setShareModalActive(true)}
-					>
-						Share
-					</button>
+					<div className="btns">
+						<button
+							className="btn"
+							onClick={() => setShareModalActive(true)}
+						>
+							Share
+						</button>
+						<button className="btn settings">
+							<img src="/icons/history.svg" alt="" />
+						</button>
+						<button
+							className="btn"
+							onClick={() => setShowPins(!showPins)}
+						>
+							<img
+								src={`/icons/eye${showPins ? "-off" : ""}.svg`}
+								alt=""
+								title="Show Pins"
+							/>
+						</button>
+					</div>
 				</div>
 				<div className="disclaimer">
 					Pinch and pan to navigate canvas.
@@ -766,74 +782,71 @@ export default function RoomClient({ room_id }) {
 													src={imageUrl}
 													alt="File Preview"
 												/>
-												{displayPins.map((pin) => (
-													<div
-														key={pin.id}
-														id={`pin-${pin.id}`}
-														className="pin"
-														style={{
-															left: `${pin.x * 100}%`,
-															top: `${pin.y * 100}%`,
-														}}
-													>
-														{pin.markerType ===
-														"x" ? (
-															<XMarker
-																color={
-																	findAuthor(
-																		pin,
-																	)?.color
-																}
-																onClick={(
-																	e,
-																) => {
-																	e.stopPropagation();
-
-																	showPinDetails(
-																		pin,
-																	);
-																}}
-															/>
-														) : (
-															<ScribbleMarker
-																color={
-																	findAuthor(
-																		pin,
-																	)?.color
-																}
-																onClick={(
-																	e,
-																) => {
-																	e.stopPropagation();
-
-																	showPinDetails(
-																		pin,
-																	);
-																}}
-															/>
-														)}
+												<div
+													className={
+														showPins
+															? "pins active"
+															: "pins"
+													}
+												>
+													{displayPins.map((pin) => (
 														<div
-															className={
-																!pin.comment
-																	? "comment-card d-none"
-																	: "comment-card"
-															}
+															key={pin.id}
+															id={`pin-${pin.id}`}
+															className="pin"
 															style={{
-																backgroundColor:
-																	findAuthor(
-																		pin,
-																	)?.color,
-																color: getContrastColor(
-																	findAuthor(
-																		pin,
-																	)?.color,
-																),
+																left: `${pin.x * 100}%`,
+																top: `${pin.y * 100}%`,
 															}}
 														>
-															{pin.comment}
+															{pin.markerType ===
+															"x" ? (
+																<XMarker
+																	color={
+																		findAuthor(
+																			pin,
+																		)?.color
+																	}
+																	onClick={(
+																		e,
+																	) => {
+																		e.stopPropagation();
+
+																		showPinDetails(
+																			pin,
+																		);
+																	}}
+																/>
+															) : (
+																<ScribbleMarker
+																	color={
+																		findAuthor(
+																			pin,
+																		)?.color
+																	}
+																	onClick={(
+																		e,
+																	) => {
+																		e.stopPropagation();
+
+																		showPinDetails(
+																			pin,
+																		);
+																	}}
+																/>
+															)}
 															<div
-																className="username"
+																className={
+																	!pin.comment
+																		? "comment-card d-none"
+																		: "comment-card"
+																}
 																style={{
+																	backgroundColor:
+																		findAuthor(
+																			pin,
+																		)
+																			?.color,
 																	color: getContrastColor(
 																		findAuthor(
 																			pin,
@@ -842,15 +855,28 @@ export default function RoomClient({ room_id }) {
 																	),
 																}}
 															>
-																{
-																	findAuthor(
-																		pin,
-																	)?.name
-																}
+																{pin.comment}
+																<div
+																	className="username"
+																	style={{
+																		color: getContrastColor(
+																			findAuthor(
+																				pin,
+																			)
+																				?.color,
+																		),
+																	}}
+																>
+																	{
+																		findAuthor(
+																			pin,
+																		)?.name
+																	}
+																</div>
 															</div>
 														</div>
-													</div>
-												))}
+													))}
+												</div>
 											</div>
 										</div>
 									</TransformComponent>
@@ -1031,7 +1057,7 @@ export default function RoomClient({ room_id }) {
 								<input
 									type="text"
 									className="form-control"
-                                    ref={commentRef}
+									ref={commentRef}
 									placeholder={
 										inputMode.mode === "create" &&
 										inputMode.to === "comment"
@@ -1094,7 +1120,7 @@ export default function RoomClient({ room_id }) {
 							shareModalActive={shareModalActive}
 							setShareModalActive={setShareModalActive}
 							activeUsers={activeUsers}
-                            delay={delay}
+							delay={delay}
 						/>
 					</>
 				)}
