@@ -440,6 +440,7 @@ export default function RoomClient({ room_id }) {
 	}
 
 	async function handleImageClick(e) {
+        setShowPins(true)
 		if (pinDetail) return;
 
 		setInputMode((prev) => ({ ...prev, mode: "create", to: "comment" }));
