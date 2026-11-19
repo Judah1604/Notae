@@ -4,7 +4,7 @@ import "../styles/dashboard.css";
 import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Topbar from "../components/Topbar";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient();
 
@@ -17,6 +17,7 @@ function page() {
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [imageSrc, setImageSrc] = useState("");
 	const [roomName, setRoomName] = useState("");
+	const router = useRouter();
 
 	useEffect(() => {
 		async function getUserData() {
@@ -30,7 +31,7 @@ function page() {
 			}
 
 			if (!userData) {
-				redirect("/login");
+				router.replace("/login");
 				return;
 			}
 
@@ -158,7 +159,7 @@ function page() {
 		}
 
 		// 5. Navigate to room
-		redirect(`/room/${room.id}`);
+		router.push(`/room/${room.id}`);
 	};
 
 	return (

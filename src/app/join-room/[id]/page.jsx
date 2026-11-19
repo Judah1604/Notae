@@ -3,7 +3,7 @@ import JoinRoomClient from "./JoinRoomClient";
 
 async function JoinRoomLoader({ params }) {
     const { id } = await params; 
-    return <JoinRoomClient room_id={ido} />;
+    return <JoinRoomClient room_id={id} />;
 }
 
 export default function Page({ params }) {

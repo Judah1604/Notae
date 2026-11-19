@@ -440,7 +440,7 @@ export default function RoomClient({ room_id }) {
 	}
 
 	async function handleImageClick(e) {
-        setShowPins(true)
+		setShowPins(true);
 		if (pinDetail) return;
 
 		setInputMode((prev) => ({ ...prev, mode: "create", to: "comment" }));
@@ -617,7 +617,10 @@ export default function RoomClient({ room_id }) {
 			.select()
 			.single();
 
-		if (error) console.error(error);
+		if (error) {
+			console.error(error);
+			return;
+		}
 
 		setReplies((currentReplies) => {
 			if (currentReplies.some((item) => item.id === data.id)) {
