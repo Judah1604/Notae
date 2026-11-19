@@ -17,6 +17,7 @@ function page() {
 	const [selectedFile, setSelectedFile] = useState(null);
 	const [imageSrc, setImageSrc] = useState("");
 	const [roomName, setRoomName] = useState("");
+	const [hasCreated, setHasCreated] = useState(false);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -159,7 +160,7 @@ function page() {
 		}
 
 		// 5. Navigate to room
-        router.refresh();
+		router.refresh();
 		router.push(`/room/${room.id}`);
 	};
 
@@ -207,7 +208,13 @@ function page() {
 						</div>
 						<div className="items">
 							<span>File max: 6MB</span>
-							<button type="submit">Create Room</button>
+							<button
+								type="submit"
+								disabled={hasCreated}
+								onClick={() => setHasCreated(true)}
+							>
+								Create Room
+							</button>
 						</div>
 					</form>
 				</div>
