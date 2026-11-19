@@ -4,7 +4,7 @@
 
 Notae is a collaborative design-critique board. Upload a design, invite people into a room, and drop pins on the exact spot you want to discuss. Every pin carries a comment and a reply thread, and everything syncs live between everyone in the room.
 
-![Notae demo](screenshot.png)
+![Notae demo](public/screenshot.png)
 <!-- Add a screenshot or demo GIF here. It's the single biggest thing a README can have. -->
 
 <!-- Add the demo video / live link here -->
