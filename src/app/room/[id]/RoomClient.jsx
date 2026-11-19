@@ -313,6 +313,7 @@ export default function RoomClient({ room_id }) {
 
 			if (authError || !user) {
 				console.error("Authentication failed:", authError);
+                router.replace('/login')
 				return;
 			}
 
