@@ -1,11 +1,23 @@
 import { useRouter } from "next/navigation";
 
 function DeleteContent({ user, room, setModal, supabase }) {
-	const router = useRouter();
 
 	async function deleteRoom() {
 		if (!room || !user) return;
 
+		// Remove the image first
+		if (room.image_path) {
+			const { error: storageError } = await supabase.storage
+				.from("designs")
+				.remove([room.image_path]);
+
+			if (storageError) {
+				console.error("Failed to delete room image:", storageError);
+				return;
+			}
+		}
+
+		// Delete the room
 		const { error } = await supabase
 			.from("rooms")
 			.delete()
@@ -17,16 +29,9 @@ function DeleteContent({ user, room, setModal, supabase }) {
 			return;
 		}
 
-        if (room.image_path) {
-			const { error: storageError } = await supabase.storage
-				.from("designs")
-				.remove([room.image_path]);
+		setModal((prev) => ({ ...prev, isActive: false }));
 
-			if (storageError) throw storageError;
-		}
-
-        router.refresh();
-		router.push("/home");
+		window.location.href = "/home";
 	}
 	return (
 		<div className="content">

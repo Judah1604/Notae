@@ -1,7 +1,11 @@
 export function timeAgo(timestamp) {
-	const seconds = Math.floor(
-		(Date.now() - new Date(timestamp).getTime()) / 1000,
+	const date = new Date(
+		timestamp.includes("Z") || /[+-]\d{2}:\d{2}$/.test(timestamp)
+			? timestamp
+			: timestamp.replace(" ", "T") + "Z",
 	);
+
+	const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
 
 	if (seconds < 60) return "Just now";
 
@@ -20,8 +24,7 @@ export function timeAgo(timestamp) {
 	const months = Math.floor(days / 30);
 	if (months < 12) return `${months}mo ago`;
 
-	const years = Math.floor(days / 365);
-	return `${years}y ago`;
+	return `${Math.floor(days / 365)}y ago`;
 }
 
 export function formatTime(timestamp) {
