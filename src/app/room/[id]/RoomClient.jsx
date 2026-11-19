@@ -745,9 +745,9 @@ export default function RoomClient({ room_id }) {
 						>
 							Share
 						</button>
-						<button className="btn settings">
+						{/* <button className="btn settings">
 							<img src="/icons/history.svg" alt="" />
-						</button>
+						</button> */}
 						<button
 							className="btn"
 							onClick={() => setShowPins(!showPins)}

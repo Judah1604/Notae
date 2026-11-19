@@ -1,12 +1,25 @@
 import { formatTime } from "@/lib/timeAgo";
 import React from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 
 function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
-	const [sideBarActive, setSideBarActive] = useState(false);
+	const [sideBarActive, setSideBarActive] = useState(true);
+
+	useEffect(() => {
+		const checkScreenSize = () => {
+			setSideBarActive(window.innerWidth < 530);
+		};
+
+		checkScreenSize();
+
+		window.addEventListener("resize", checkScreenSize);
+
+		return () => window.removeEventListener("resize", checkScreenSize);
+	}, []);
 
 	return (
-		<div className={sideBarActive ? "sidebar-wrap active" : "sidebar-wrap"}>
+		<div className={`sidebar-wrap ${sideBarActive ? "active" : ""}`}>
 			<div className="pins-sidebar">
 				<div className="header">
 					<a href="/home">

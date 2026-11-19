@@ -232,7 +232,7 @@ button, a.btn {
 	.share-modal .dialog {
 		.copy {
 			align-items: flex-start;
-			gap: 12px;
+			gap: 3px;
 			flex-direction: column;
 
 			.items {
