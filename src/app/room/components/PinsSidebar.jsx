@@ -70,12 +70,17 @@ function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
 					)}
 				</div>
 			</div>
-			<div
+			<button
+				type="button"
 				className={sideBarActive ? "expand active" : "expand"}
+				aria-label={
+					sideBarActive ? "Open pins sidebar" : "Close pins sidebar"
+				}
+				aria-expanded={!sideBarActive}
 				onClick={() => setSideBarActive(!sideBarActive)}
 			>
 				<img src="/icons/arrow-right.svg" alt="" />
-			</div>
+			</button>
 		</div>
 	);
 }

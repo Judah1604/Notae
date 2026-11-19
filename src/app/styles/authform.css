@@ -90,6 +90,33 @@
 			}
 		}
 
+		@media (max-width: 600px) {
+			.wrapper {
+				min-height: 100vh;
+				height: auto;
+				padding: 20px 14px;
+
+				form {
+					width: 100%;
+					padding: 24px 20px;
+					border-radius: 16px;
+
+					.header p {
+						width: 100%;
+					}
+
+					h1 {
+						font-size: clamp(1.8rem, 8vw, 2.4rem);
+					}
+
+					.extra {
+						flex-wrap: wrap;
+						gap: 8px;
+					}
+				}
+			}
+		}
+
 		h1 {
 			font-weight: 600;
 		}

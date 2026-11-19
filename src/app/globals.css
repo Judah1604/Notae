@@ -201,6 +201,63 @@ button, a.btn {
 	}
 }
 
+@media (max-width: 760px) {
+	.share-modal,
+	.confirmation-modal {
+		position: fixed;
+		height: 100vh;
+		height: 100dvh;
+		padding: 16px;
+
+		.backdrop {
+			height: 100vh;
+			height: 100dvh;
+		}
+
+		.dialog {
+			width: min(700px, 100%);
+			max-height: calc(100vh - 32px);
+			max-height: calc(100dvh - 32px);
+			overflow-y: auto;
+			padding: clamp(20px, 5vw, 32px);
+
+			.content .btns {
+				flex-wrap: wrap;
+			}
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.share-modal .dialog {
+		.copy {
+			align-items: flex-start;
+			gap: 12px;
+			flex-direction: column;
+
+			.items {
+				display: flex;
+				align-items: center;
+				width: 100%;
+				justify-content: space-between;
+			}
+		}
+
+		.members {
+			gap: 14px;
+			flex-direction: column;
+		}
+	}
+
+	.confirmation-modal .dialog .content .btns {
+		flex-direction: column;
+
+		.btn {
+			width: 100%;
+		}
+	}
+}
+
 
 @media (prefers-color-scheme: dark) {
 	html {

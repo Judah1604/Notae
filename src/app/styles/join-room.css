@@ -1,9 +1,11 @@
 .join-room {
 	display: grid;
 	place-items: center;
-	height: 100vh;
+	min-height: 100vh;
+	padding: 24px 16px;
 
 	.content {
+		width: min(100%, 640px);
 		border: 1px solid #262626;
 		padding: 30px 50px;
 		border-radius: 20px;
@@ -20,6 +22,26 @@
 			display: flex;
 			justify-content: center;
 			gap: 15px;
+		}
+	}
+}
+
+@media (max-width: 520px) {
+	.join-room {
+		.content {
+			padding: 24px 18px;
+
+			h2 {
+				font-size: clamp(1.45rem, 7vw, 2rem);
+			}
+
+			.btns {
+				flex-direction: column;
+
+				.btn {
+					width: 100%;
+				}
+			}
 		}
 	}
 }
