@@ -368,10 +368,6 @@ body {
 		opacity: 0;
 	}
 
-	/* &.active {
-		transform: translateX(0) !important;
-	} */
-
 	&::-webkit-scrollbar {
 		width: 5px;
 	}
@@ -379,6 +375,21 @@ body {
 		width: 5px;
 		background-color: #323232;
 		border-radius: 10px;
+	}
+
+	.close-sidebar {
+		width: 23px !important;
+		height: 23px !important;
+		opacity: 0.4;
+		transition: 0.3s ease;
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: none;
+
+        &:hover {
+            opacity: 1;
+        }
 	}
 
 	.header {
@@ -576,6 +587,10 @@ body {
 		.sidebar-wrap {
 			width: 98%;
 		}
+
+        .close-sidebar {
+            display: block;
+        }
 
 		.pin-details {
 			top: auto;

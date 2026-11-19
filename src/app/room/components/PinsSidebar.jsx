@@ -26,6 +26,11 @@ function PinsSidebar({ pins, findAuthor, zoomRef, roomInfo, showPinDetails }) {
 						<img src="/icons/chevron-left.svg" alt="" /> Back
 					</a>
 					<h3>{roomInfo?.name || "Loading..."}</h3>
+					<img
+						src="/icons/x.svg"
+						className="close-sidebar"
+						onClick={() => setSideBarActive(true)}
+					/>
 				</div>
 				<div className="pins">
 					{pins.length === 0 ? (
