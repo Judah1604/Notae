@@ -18,8 +18,8 @@ function LeaveContent({ user, room, setModal, supabase }) {
 		}
 
 		setModal((prev) => ({ ...prev, isActive: false }));
-		router.push("/home");
         router.refresh();
+		router.push("/home");
 	}
 
 	return (

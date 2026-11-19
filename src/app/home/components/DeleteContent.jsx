@@ -17,8 +17,16 @@ function DeleteContent({ user, room, setModal, supabase }) {
 			return;
 		}
 
-		router.push("/home");
+        if (room.image_path) {
+			const { error: storageError } = await supabase.storage
+				.from("designs")
+				.remove([room.image_path]);
+
+			if (storageError) throw storageError;
+		}
+
         router.refresh();
+		router.push("/home");
 	}
 	return (
 		<div className="content">

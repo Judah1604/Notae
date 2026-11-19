@@ -159,6 +159,7 @@ function page() {
 		}
 
 		// 5. Navigate to room
+        router.refresh();
 		router.push(`/room/${room.id}`);
 	};
 

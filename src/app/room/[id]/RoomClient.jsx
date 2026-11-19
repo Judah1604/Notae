@@ -342,7 +342,9 @@ export default function RoomClient({ room_id }) {
 				}));
 
 				setIsMember(false);
+                router.refresh();
 				router.push("/join-room/" + room_id);
+                return
 			}
 
 			setIsMember(true);
