@@ -1,6 +1,7 @@
 import { EB_Garamond, Geist, Inter } from "next/font/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -27,7 +28,9 @@ export default function RootLayout({ children }) {
 			lang="en"
 			className={`${geistSans.variable} ${inter.variable} ${eb_garamond.variable}`}
 		>
-			<body>{children}</body>
+			<body>
+				{children} <Analytics />
+			</body>
 		</html>
 	);
 }
