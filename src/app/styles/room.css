@@ -247,6 +247,7 @@ body {
 			.reply {
 				background-color: #323232;
 				flex-direction: column;
+                overflow-wrap: break-word;
 
 				.items {
 					display: flex;
