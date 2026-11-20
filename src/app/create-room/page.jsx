@@ -69,8 +69,15 @@ function page() {
 
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
+		const MAX_FILE_SIZE = 6 * 1024 * 1024;
 
 		if (!file) return;
+
+		if (file.size > MAX_FILE_SIZE) {
+			alert("Image must be 6MB or smaller");
+			event.target.value = "";
+			return;
+		}
 
 		if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
 			alert("Please select a PNG, JPEG, or WebP image.");
@@ -211,7 +218,9 @@ function page() {
 							<button
 								type="submit"
 								disabled={hasCreated}
-								onClick={() => setHasCreated(true)}
+								onClick={() => {
+									setHasCreated(true);
+								}}
 							>
 								Create Room
 							</button>

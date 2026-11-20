@@ -87,6 +87,11 @@ button, a.btn {
 		color: #262626 !important;
 	}
 
+    &:disabled {
+        opacity: 0.3;
+        
+    }
+
     &.secondary {
 		background-color: #262626 !important;
 		color: white !important;

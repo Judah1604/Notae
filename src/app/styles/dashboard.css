@@ -353,7 +353,7 @@ body {
 
 		.room .info {
 			align-items: flex-start;
-			gap: 8px;
+			gap: 0px;
 			flex-direction: column;
 
 			.items {
