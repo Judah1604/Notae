@@ -70,12 +70,19 @@ textarea {
 	}
 }
 
-button, a.btn {
+button,
+a.btn {
 	background-color: white !important;
 	color: #262626 !important;
 	padding: 10px 20px !important;
 	border: none;
 	border-radius: 15px !important;
+
+	&.loader {
+		display: flex !important;
+		align-items: center;
+		gap: 10px;
+	}
 
 	&:hover {
 		background-color: #e8e6e6 !important;
@@ -87,12 +94,11 @@ button, a.btn {
 		color: #262626 !important;
 	}
 
-    &:disabled {
-        opacity: 0.3;
-        
-    }
+	&:disabled {
+		opacity: 0.3;
+	}
 
-    &.secondary {
+	&.secondary {
 		background-color: #262626 !important;
 		color: white !important;
 
@@ -100,7 +106,7 @@ button, a.btn {
 
 		&:hover {
 			background-color: #323232 !important;
-            color: white !important;
+			color: white !important;
 		}
 
 		img {
@@ -110,8 +116,9 @@ button, a.btn {
 	}
 }
 
-.share-modal, .confirmation-modal {
-	position: absolute;
+.share-modal,
+.confirmation-modal {
+	position: sticky;
 	inset: 0;
 	z-index: 100;
 	width: 100%;
@@ -121,9 +128,9 @@ button, a.btn {
 	place-items: center;
 	border: 1px solid #323232;
 
-    &.active {
-        display: grid;
-    }
+	&.active {
+		display: grid;
+	}
 
 	.backdrop {
 		z-index: 10000;
@@ -142,39 +149,38 @@ button, a.btn {
 		border-radius: 20px;
 		width: 700px;
 
-        .content  {
-            text-align: center;
-            h2 {
-                margin-bottom: 30px;
-                span {
-                    font-weight: 700;
-                }
-            }
+		.content {
+			text-align: center;
+			h2 {
+				margin-bottom: 30px;
+				span {
+					font-weight: 700;
+				}
+			}
 
-            .btns {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-               
-            }
-        }
+			.btns {
+				display: flex;
+				justify-content: center;
+				gap: 10px;
+			}
+		}
 
 		.copy {
 			display: flex;
 			justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+			align-items: center;
+			margin-bottom: 20px;
 
-            .close-modal {
-                transition: 0.3s ease;
-                margin-left: 7px;
-                opacity: 0.3;
-                cursor: pointer;
+			.close-modal {
+				transition: 0.3s ease;
+				margin-left: 7px;
+				opacity: 0.3;
+				cursor: pointer;
 
-                &:hover {
-                    opacity: 1;
-                }
-            }
+				&:hover {
+					opacity: 1;
+				}
+			}
 		}
 
 		.members {
@@ -187,9 +193,9 @@ button, a.btn {
 				height: 15px;
 				border-radius: 100px;
 
-                &.online {
-                    border: 2px solid white;
-                }
+				&.online {
+					border: 2px solid white;
+				}
 			}
 
 			.creator {
@@ -262,7 +268,6 @@ button, a.btn {
 		}
 	}
 }
-
 
 @media (prefers-color-scheme: dark) {
 	html {

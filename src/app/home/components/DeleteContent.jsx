@@ -1,38 +1,57 @@
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function DeleteContent({ user, room, setModal, supabase }) {
+	const [hasDeleted, setHasDeleted] = useState(false);
 
 	async function deleteRoom() {
-		if (!room || !user) return;
+		if (!room || !user || hasDeleted) return;
 
-		// Remove the image first
-		if (room.image_path) {
-			const { error: storageError } = await supabase.storage
-				.from("designs")
-				.remove([room.image_path]);
+		setHasDeleted(true);
 
-			if (storageError) {
-				console.error("Failed to delete room image:", storageError);
-				return;
+		try {
+			// 1. Delete room memberships
+			const { error: memberError } = await supabase
+				.from("room_members")
+				.delete()
+				.eq("room_id", room.id);
+
+			if (memberError) throw memberError;
+
+			// 2. Delete the room image
+			if (room.image_path) {
+				const { error: storageError } = await supabase.storage
+					.from("designs")
+					.remove([room.image_path]);
+
+				if (storageError) throw storageError;
 			}
-		}
 
-		// Delete the room
-		const { error } = await supabase
-			.from("rooms")
-			.delete()
-			.eq("id", room.id)
-			.eq("created_by", user.id);
+			// 3. Delete the room
+			const { data, error } = await supabase
+				.from("rooms")
+				.delete()
+				.eq("id", room.id)
+				.eq("created_by", user.id)
+				.select();
 
-		if (error) {
+			if (error) throw error;
+
+			if (!data?.length) {
+				throw new Error(
+					"No room was deleted. Check ownership and RLS.",
+				);
+			}
+
+			// 4. Close modal and navigate
+			setModal((prev) => ({ ...prev, isActive: false }));
+			window.location.href = "/home";
+		} catch (error) {
 			console.error("Failed to delete room:", error);
-			return;
+			alert(error.message || "Room deletion failed.");
+			setHasDeleted(false);
 		}
-
-		setModal((prev) => ({ ...prev, isActive: false }));
-
-		window.location.href = "/home";
 	}
+
 	return (
 		<div className="content">
 			<h2>
@@ -47,8 +66,19 @@ function DeleteContent({ user, room, setModal, supabase }) {
 				>
 					Cancel and Close
 				</button>
-				<button className="btn primary" onClick={deleteRoom}>
-					Delete Room
+				<button
+					className="btn primary loader"
+					disabled={hasDeleted}
+					onClick={deleteRoom}
+				>
+					{hasDeleted ? (
+						<>
+							<span className="spinner" />
+							Deleting room...
+						</>
+					) : (
+						"Delete Room"
+					)}
 				</button>
 			</div>
 		</div>

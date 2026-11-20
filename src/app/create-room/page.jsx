@@ -101,74 +101,57 @@ function page() {
 			return;
 		}
 
-		// 1. Create room
-		const { data: room, error: roomError } = await supabase
-			.from("rooms")
-			.insert({
-				name: roomName,
-				created_by: user.id,
-			})
-			.select()
-			.single();
+		setHasCreated(true);
 
-		if (roomError) {
-			console.error("Room creation failed:", {
-				message: roomError.message,
-				code: roomError.code,
-				details: roomError.details,
-				hint: roomError.hint,
-			});
+		try {
+			// 1. Create room
+			const { data: room, error: roomError } = await supabase
+				.from("rooms")
+				.insert({
+					name: roomName,
+					created_by: user.id,
+				})
+				.select()
+				.single();
 
-			alert(roomError.message);
-			return;
+			if (roomError) throw roomError;
+
+			// 2. Add creator to room_members
+			const { error: memberError } = await supabase
+				.from("room_members")
+				.insert({
+					room_id: room.id,
+					user_id: user.id,
+				});
+
+			if (memberError) throw memberError;
+
+			// 3. Upload image
+			const extension = selectedFile.name.split(".").pop();
+			const filePath = `${room.id}/design.${extension}`;
+
+			const { data: uploadedFile, error: uploadError } =
+				await supabase.storage
+					.from("designs")
+					.upload(filePath, selectedFile);
+
+			if (uploadError) throw uploadError;
+
+			// 4. Save image path
+			const { error: imageError } = await supabase
+				.from("rooms")
+				.update({ image_path: uploadedFile.path })
+				.eq("id", room.id);
+
+			if (imageError) throw imageError;
+
+			// 5. Navigate
+			router.push(`/room/${room.id}`);
+		} catch (error) {
+			console.error("Room creation failed:", error);
+			alert(error.message || "Something went wrong creating the room.");
+			setHasCreated(false);
 		}
-
-		console.log("Room created:", room);
-
-		// 2. Add creator to room_members
-		const { error: memberError } = await supabase
-			.from("room_members")
-			.insert({
-				room_id: room.id,
-				user_id: user.id,
-			});
-
-		if (memberError) {
-			console.error("Membership creation failed:", memberError);
-			return;
-		}
-
-		// 3. Upload image to Storage
-		const extension = selectedFile.name.split(".").pop();
-
-		const filePath = `${room.id}/design.${extension}`;
-
-		const { data: uploadedFile, error: uploadError } =
-			await supabase.storage
-				.from("designs")
-				.upload(filePath, selectedFile);
-
-		if (uploadError) {
-			console.error("Image upload failed:", uploadError);
-			return;
-		}
-
-		// 4. Save image information to room
-		const { error: imageError } = await supabase
-			.from("rooms")
-			.update({
-				image_path: uploadedFile.path,
-			})
-			.eq("id", room.id);
-
-		if (imageError) {
-			console.error("Image information update failed:", imageError);
-			return;
-		}
-
-		// 5. Navigate to room
-		router.refresh();
-		router.push(`/room/${room.id}`);
 	};
 
 	return (
@@ -215,14 +198,15 @@ function page() {
 						</div>
 						<div className="items">
 							<span>File max: 6MB</span>
-							<button
-								type="submit"
-								disabled={hasCreated}
-								onClick={() => {
-									setHasCreated(true);
-								}}
-							>
-								Create Room
+							<button type="submit" className="loader" disabled={hasCreated}>
+								{hasCreated ? (
+									<>
+										<span className="spinner" />
+										Creating room...
+									</>
+								) : (
+									"Create Room"
+								)}
 							</button>
 						</div>
 					</form>

@@ -27,7 +27,7 @@ function page() {
 
 	async function fetchMoreRoomInfo(room) {
 		const [imageResult, membersResult] = await Promise.all([
-			room.image_path
+			room.image_path 
 				? supabase.storage
 						.from("designs")
 						.createSignedUrl(room.image_path, 3600)
