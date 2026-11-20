@@ -67,6 +67,21 @@ function page() {
 		load();
 	}, []);
 
+	async function checkDuplicateRoomName() {
+		const normalizedName = roomName.trim().toLowerCase();
+
+		const { data, error } = await supabase
+			.from("rooms")
+			.select("id, name")
+			.eq("created_by", user.id);
+
+		if (error) throw error;
+
+		return data.some(
+			(room) => room.name.trim().toLowerCase() === normalizedName,
+		);
+	}
+
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
 		const MAX_FILE_SIZE = 6 * 1024 * 1024;
@@ -98,6 +113,14 @@ function page() {
 
 		if (!user.id) {
 			alert("User information is still loading.");
+			return;
+		}
+
+		const isDuplicate = checkDuplicateRoomName();
+		if (isDuplicate) {
+			alert(
+				"Please make a room with a different name. You already have a room with the same name",
+			);
 			return;
 		}
 
@@ -198,7 +221,11 @@ function page() {
 						</div>
 						<div className="items">
 							<span>File max: 6MB</span>
-							<button type="submit" className="loader" disabled={hasCreated}>
+							<button
+								type="submit"
+								className="loader"
+								disabled={hasCreated}
+							>
 								{hasCreated ? (
 									<>
 										<span className="spinner" />

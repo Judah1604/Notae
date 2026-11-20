@@ -9,6 +9,7 @@ function page() {
 		password: "",
 	});
 	const [error, setError] = useState(null);
+	const [isPressed, setIsPressed] = useState(false);
 
 	const handleChange = (e) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -16,9 +17,12 @@ function page() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setIsPressed(true);
+
 		const result = await loginAction(formData);
 		if (result.error) {
 			setError(result.error);
+			setIsPressed(false);
 
 			if (result.error === "Invalid Username or Password") {
 				setFormData((prev) => ({ ...prev, password: "" }));
@@ -67,8 +71,15 @@ function page() {
 					/>
 				</div>
 
-				<button type="submit" className="btn btn-primary">
-					Continue to your account
+				<button type="submit" disabled={isPressed} className="btn btn-primary loader">
+					{isPressed ? (
+						<>
+							<span className="spinner" />
+							Logging you in...
+						</>
+					) : (
+						"Continue to your account"
+					)}
 				</button>
 				<div className="extra">
 					<div className="account">

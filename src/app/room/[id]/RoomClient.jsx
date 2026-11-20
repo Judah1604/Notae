@@ -12,6 +12,7 @@ import { formatTime } from "@/lib/timeAgo";
 import PinsSidebar from "../components/PinsSidebar";
 import ShareModal from "../components/ShareModal";
 import { useRouter } from "next/navigation";
+import ConfirmationModal from "@/app/home/components/ConfirmationModal";
 
 const supabase = createClient();
 export default function RoomClient({ room_id }) {
@@ -60,6 +61,12 @@ export default function RoomClient({ room_id }) {
 	});
 	const [shareModalActive, setShareModalActive] = useState(false);
 	const [showPins, setShowPins] = useState(true);
+	const [modal, setModal] = useState({
+		type: "pin",
+		isActive: false,
+		object: null,
+		function: null,
+	});
 	const router = useRouter();
 	const commentRef = useRef(null);
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -313,7 +320,7 @@ export default function RoomClient({ room_id }) {
 
 			if (authError || !user) {
 				console.error("Authentication failed:", authError);
-                router.replace('/login')
+				router.replace("/login");
 				return;
 			}
 
@@ -342,9 +349,9 @@ export default function RoomClient({ room_id }) {
 				}));
 
 				setIsMember(false);
-                router.refresh();
+				router.refresh();
 				router.push("/join-room/" + room_id);
-                return
+				return;
 			}
 
 			setIsMember(true);
@@ -930,7 +937,15 @@ export default function RoomClient({ room_id }) {
 									<img
 										src="/icons/trash-2.svg"
 										alt=""
-										onClick={() => deletePin(pinDetail.id)}
+										onClick={() =>
+											setModal((prev) => ({
+												...prev,
+												type: "pin",
+												isActive: true,
+												function: () =>
+													deletePin(pinDetail.id),
+											}))
+										}
 									/>
 								)}
 							</div>
@@ -1129,6 +1144,7 @@ export default function RoomClient({ room_id }) {
 							activeUsers={activeUsers}
 							delay={delay}
 						/>
+						<ConfirmationModal modal={modal} setModal={setModal} />
 					</>
 				)}
 			</div>

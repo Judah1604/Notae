@@ -1,11 +1,16 @@
 import DeleteContent from "./DeleteContent";
+import DeletePinContent from "./DeletePinContent";
 import LeaveContent from "./LeaveContent";
 
 function ConfirmationModal({ modal, setModal, supabase }) {
-	if (!modal?.object?.room && !modal?.object?.user) return null;
+	if (!modal?.isActive) return null;
+
+	if (modal.type !== "pin" && !modal?.object?.room && !modal?.object?.user)
+		return null;
 
 	const room = modal?.object?.room,
-		user = modal?.object?.user;
+		user = modal?.object?.user,
+		functoExec = modal?.function;
 
 	return (
 		<div
@@ -38,6 +43,8 @@ function ConfirmationModal({ modal, setModal, supabase }) {
 						room={room}
 						supabase={supabase}
 					/>
+				) : modal.type === "pin" ? (
+					<DeletePinContent functoExec={functoExec} setModal={setModal} />
 				) : (
 					""
 				)}

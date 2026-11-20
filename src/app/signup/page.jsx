@@ -3,13 +3,14 @@ import { useState } from "react";
 import "../styles/authform.css";
 import { signupAction } from "./signUpAction";
 
-function page() {
+function Page() {
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
 		password: "",
 	});
 	const [error, setError] = useState(null);
+	const [isPressed, setIsPressed] = useState(false);
 
 	const handleChange = (e) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -17,10 +18,14 @@ function page() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setError(null);
+		setIsPressed(true);
+
 		const result = await signupAction(formData);
 		if (result.error) {
 			setError(result.error);
-			console.error("Login error:", result.error);
+			setIsPressed(false);
+			console.error("Signup error:", result.error);
 		}
 	};
 
@@ -76,8 +81,15 @@ function page() {
 						required
 					/>
 				</div>
-				<button type="submit" className="btn btn-primary">
-					Create Account
+				<button type="submit" disabled={isPressed} className="btn btn-primary loader">
+					{isPressed ? (
+						<>
+							<span className="spinner" />
+							Creating your account...
+						</>
+					) : (
+						"Create Account"
+					)}
 				</button>
 				<div className="extra">
 					<div className="account">
@@ -90,4 +102,4 @@ function page() {
 	);
 }
 
-export default page;
+export default Page;
