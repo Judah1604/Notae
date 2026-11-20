@@ -18,6 +18,7 @@ function page() {
 	const [imageSrc, setImageSrc] = useState("");
 	const [roomName, setRoomName] = useState("");
 	const [hasCreated, setHasCreated] = useState(false);
+	const [createProgress, setCreateProgress] = useState("Creating room...");
 	const router = useRouter();
 
 	useEffect(() => {
@@ -106,6 +107,8 @@ function page() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
+		if (hasCreated) return;
+
 		if (!selectedFile) {
 			alert("Please select an image.");
 			return;
@@ -116,28 +119,34 @@ function page() {
 			return;
 		}
 
-		const isDuplicate = checkDuplicateRoomName();
-		if (isDuplicate) {
-			alert(
-				"Please make a room with a different name. You already have a room with the same name",
-			);
+		if (!roomName.trim()) {
+			alert("Please enter a valid room name.");
 			return;
 		}
 
 		setHasCreated(true);
+
+		const isDuplicate = await checkDuplicateRoomName();
+		if (isDuplicate) {
+			 alert(
+					"You already have a room with this name. Please choose another name.",
+				);
+			return;
+		}
 
 		try {
 			// 1. Create room
 			const { data: room, error: roomError } = await supabase
 				.from("rooms")
 				.insert({
-					name: roomName,
+					name: roomName.trim(),
 					created_by: user.id,
 				})
 				.select()
 				.single();
 
 			if (roomError) throw roomError;
+			setCreateProgress("Making you a member");
 
 			// 2. Add creator to room_members
 			const { error: memberError } = await supabase
@@ -148,6 +157,8 @@ function page() {
 				});
 
 			if (memberError) throw memberError;
+
+			setCreateProgress("Uploading your image to the room");
 
 			// 3. Upload image
 			const extension = selectedFile.name.split(".").pop();
@@ -160,6 +171,8 @@ function page() {
 
 			if (uploadError) throw uploadError;
 
+			setCreateProgress("Saving image path");
+
 			// 4. Save image path
 			const { error: imageError } = await supabase
 				.from("rooms")
@@ -167,6 +180,8 @@ function page() {
 				.eq("id", room.id);
 
 			if (imageError) throw imageError;
+
+			setCreateProgress("Redirecting you to your newly created room!");
 
 			// 5. Navigate
 			router.push(`/room/${room.id}`);
@@ -229,7 +244,7 @@ function page() {
 								{hasCreated ? (
 									<>
 										<span className="spinner" />
-										Creating room...
+										{createProgress}
 									</>
 								) : (
 									"Create Room"
