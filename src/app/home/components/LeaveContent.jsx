@@ -1,25 +1,31 @@
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function LeaveContent({ user, room, setModal, supabase }) {
-	const router = useRouter();
+	const [hasLeft, setHasLeft] = useState(false);
 
 	async function leaveRoom() {
-		if (!room || !user) return;
+		if (!room || !user | hasLeft) return;
 
-		const { error } = await supabase
-			.from("room_members")
-			.delete()
-			.eq("room_id", room.id)
-			.eq("user_id", user.id);
+		setHasLeft(true);
 
-		if (error) {
+		try {
+			const { error } = await supabase
+				.from("room_members")
+				.delete()
+				.eq("room_id", room.id)
+				.eq("user_id", user.id);
+
+			if (error) {
+				console.error("Failed to leave room:", error);
+				return;
+			}
+			setModal((prev) => ({ ...prev, isActive: false }));
+			window.location.href = "/home";
+		} catch (error) {
 			console.error("Failed to leave room:", error);
-			return;
+			alert(error.message || "Leaving Room failed.");
+			setHasLeft(false);
 		}
-
-		setModal((prev) => ({ ...prev, isActive: false }));
-        router.refresh();
-		router.push("/home");
 	}
 
 	return (
@@ -36,8 +42,19 @@ function LeaveContent({ user, room, setModal, supabase }) {
 				>
 					Cancel and Close
 				</button>
-				<button className="btn primary" onClick={leaveRoom}>
-					Leave Room
+				<button
+					className="btn primary loader"
+					disabled={hasLeft}
+					onClick={leaveRoom}
+				>
+					{hasLeft ? (
+						<>
+							<span className="spinner" />
+							Leaving room...
+						</>
+					) : (
+						"Leave Room"
+					)}
 				</button>
 			</div>
 		</div>
