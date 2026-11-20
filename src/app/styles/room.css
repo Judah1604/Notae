@@ -9,6 +9,10 @@ body {
 	grid-template-columns: 1.2fr 3fr;
 	transition: grid-template-columns 350ms cubic-bezier(0.22, 1, 0.36, 1);
 
+    &:has(.share-modal.active, .confirmation-modal.active) {
+        display: block;
+    }
+
 	.top {
 		display: flex;
 		justify-content: end;

@@ -704,450 +704,465 @@ export default function RoomClient({ room_id }) {
 	};
 
 	return (
-		<div className="wrapper">
-			<PinsSidebar
-				pins={pins}
-				findAuthor={findAuthor}
-				zoomRef={zoomRef}
-				roomInfo={roomInfo}
-				showPinDetails={showPinDetails}
-			/>
-			<div className="content">
-				<div className="top">
-					<div className="members">
-						{activeUsers.map((user) => (
-							<div
-								key={user.id}
-								className="marker"
-								style={{ backgroundColor: user.color }}
-							></div>
-						))}
-						<div className="count">
-							{activeUsers.length > 3
-								? `+${activeUsers.length - 3}`
-								: ""}
-						</div>
-						<div className="members-drop">
+		<>
+			<div className="wrapper">
+				<PinsSidebar
+					pins={pins}
+					findAuthor={findAuthor}
+					zoomRef={zoomRef}
+					roomInfo={roomInfo}
+					showPinDetails={showPinDetails}
+				/>
+				<div className="content">
+					<div className="top">
+						<div className="members">
 							{activeUsers.map((user) => (
-								<div className="item" key={user.id}>
-									<div
-										className="marker"
-										style={{
-											backgroundColor: user.color,
-										}}
-									></div>
-									<span>{user.name}</span>
-									{roomInfo.creator_id === user.id ? (
-										<div className="creator">Creator</div>
-									) : currentUser.id === user.id ? (
-										<div className="creator">You</div>
-									) : (
-										""
-									)}
-								</div>
+								<div
+									key={user.id}
+									className="marker"
+									style={{ backgroundColor: user.color }}
+								></div>
 							))}
+							<div className="count">
+								{activeUsers.length > 3
+									? `+${activeUsers.length - 3}`
+									: ""}
+							</div>
+							<div className="members-drop">
+								{activeUsers.map((user) => (
+									<div className="item" key={user.id}>
+										<div
+											className="marker"
+											style={{
+												backgroundColor: user.color,
+											}}
+										></div>
+										<span>{user.name}</span>
+										{roomInfo.creator_id === user.id ? (
+											<div className="creator">
+												Creator
+											</div>
+										) : currentUser.id === user.id ? (
+											<div className="creator">You</div>
+										) : (
+											""
+										)}
+									</div>
+								))}
+							</div>
 						</div>
-					</div>
-					<div className="btns">
-						<button
-							className="btn"
-							onClick={() => setShareModalActive(true)}
-						>
-							Share
-						</button>
-						{/* <button className="btn settings">
+						<div className="btns">
+							<button
+								className="btn"
+								onClick={() => setShareModalActive(true)}
+							>
+								Share
+							</button>
+							{/* <button className="btn settings">
 							<img src="/icons/history.svg" alt="" />
 						</button> */}
-						<button
-							className="btn"
-							onClick={() => setShowPins(!showPins)}
-						>
-							<img
-								src={`/icons/eye${showPins ? "-off" : ""}.svg`}
-								alt=""
-								title="Show Pins"
-							/>
-						</button>
+							<button
+								className="btn"
+								onClick={() => setShowPins(!showPins)}
+							>
+								<img
+									src={`/icons/eye${showPins ? "-off" : ""}.svg`}
+									alt=""
+									title="Show Pins"
+								/>
+							</button>
+						</div>
 					</div>
-				</div>
-				<div className="disclaimer">
-					Pinch and pan to navigate canvas.
-				</div>
-				{isLoading ? (
-					<p className="text-center mt-3">
-						Loading room information...
-					</p>
-				) : !currentUser ? (
-					<p>Unable to load your room membership.</p>
-				) : (
-					<>
-						<TransformWrapper>
-							{({ zoomToElement }) => {
-								zoomRef.current = zoomToElement;
+					<div className="disclaimer">
+						Pinch and pan to navigate canvas.
+					</div>
+					{isLoading ? (
+						<p className="text-center mt-3">
+							Loading room information...
+						</p>
+					) : !currentUser ? (
+						<p>Unable to load your room membership.</p>
+					) : (
+						<>
+							<TransformWrapper>
+								{({ zoomToElement }) => {
+									zoomRef.current = zoomToElement;
 
-								return (
-									<TransformComponent>
-										<div className="preview">
-											<div
-												className="image-wrapper"
-												onClick={handleImageClick}
-											>
-												<img
-													src={imageUrl}
-													alt="File Preview"
-												/>
+									return (
+										<TransformComponent>
+											<div className="preview">
 												<div
-													className={
-														showPins
-															? "pins active"
-															: "pins"
-													}
+													className="image-wrapper"
+													onClick={handleImageClick}
 												>
-													{displayPins.map((pin) => (
-														<div
-															key={pin.id}
-															id={`pin-${pin.id}`}
-															className="pin"
-															style={{
-																left: `${pin.x * 100}%`,
-																top: `${pin.y * 100}%`,
-															}}
-														>
-															{pin.markerType ===
-															"x" ? (
-																<XMarker
-																	color={
-																		findAuthor(
-																			pin,
-																		)?.color
-																	}
-																	onClick={(
-																		e,
-																	) => {
-																		e.stopPropagation();
-
-																		showPinDetails(
-																			pin,
-																		);
-																	}}
-																/>
-															) : (
-																<ScribbleMarker
-																	color={
-																		findAuthor(
-																			pin,
-																		)?.color
-																	}
-																	onClick={(
-																		e,
-																	) => {
-																		e.stopPropagation();
-
-																		showPinDetails(
-																			pin,
-																		);
-																	}}
-																/>
-															)}
-															<div
-																className={
-																	!pin.comment
-																		? "comment-card d-none"
-																		: "comment-card"
-																}
-																style={{
-																	backgroundColor:
-																		findAuthor(
-																			pin,
-																		)
-																			?.color,
-																	color: getContrastColor(
-																		findAuthor(
-																			pin,
-																		)
-																			?.color,
-																	),
-																}}
-															>
-																{pin.comment}
+													<img
+														src={imageUrl}
+														alt="File Preview"
+													/>
+													<div
+														className={
+															showPins
+																? "pins active"
+																: "pins"
+														}
+													>
+														{displayPins.map(
+															(pin) => (
 																<div
-																	className="username"
+																	key={pin.id}
+																	id={`pin-${pin.id}`}
+																	className="pin"
 																	style={{
-																		color: getContrastColor(
-																			findAuthor(
-																				pin,
-																			)
-																				?.color,
-																		),
+																		left: `${pin.x * 100}%`,
+																		top: `${pin.y * 100}%`,
 																	}}
 																>
-																	{
-																		findAuthor(
-																			pin,
-																		)?.name
-																	}
+																	{pin.markerType ===
+																	"x" ? (
+																		<XMarker
+																			color={
+																				findAuthor(
+																					pin,
+																				)
+																					?.color
+																			}
+																			onClick={(
+																				e,
+																			) => {
+																				e.stopPropagation();
+
+																				showPinDetails(
+																					pin,
+																				);
+																			}}
+																		/>
+																	) : (
+																		<ScribbleMarker
+																			color={
+																				findAuthor(
+																					pin,
+																				)
+																					?.color
+																			}
+																			onClick={(
+																				e,
+																			) => {
+																				e.stopPropagation();
+
+																				showPinDetails(
+																					pin,
+																				);
+																			}}
+																		/>
+																	)}
+																	<div
+																		className={
+																			!pin.comment
+																				? "comment-card d-none"
+																				: "comment-card"
+																		}
+																		style={{
+																			backgroundColor:
+																				findAuthor(
+																					pin,
+																				)
+																					?.color,
+																			color: getContrastColor(
+																				findAuthor(
+																					pin,
+																				)
+																					?.color,
+																			),
+																		}}
+																	>
+																		{
+																			pin.comment
+																		}
+																		<div
+																			className="username"
+																			style={{
+																				color: getContrastColor(
+																					findAuthor(
+																						pin,
+																					)
+																						?.color,
+																				),
+																			}}
+																		>
+																			{
+																				findAuthor(
+																					pin,
+																				)
+																					?.name
+																			}
+																		</div>
+																	</div>
 																</div>
-															</div>
-														</div>
-													))}
+															),
+														)}
+													</div>
 												</div>
 											</div>
-										</div>
-									</TransformComponent>
-								);
-							}}
-						</TransformWrapper>
-						<div className="notifications">
-							{notifications.map((notification) => (
-								<div
-									className="notification"
-									key={notification.id}
-								>
-									{notification.message}
-								</div>
-							))}
-						</div>
-						<div
-							className={
-								pinDetail ? "pin-details active" : "pin-details"
-							}
-						>
-							<div className="title">
-								<div className="items">
-									<img
-										src="/icons/x.svg"
-										alt=""
-										className="close"
-										onClick={() => {
-											setPinDetail(null);
-											handleClose();
-										}}
-									/>
-									<span>
-										{pinDetail?.authorId ===
-										currentUser?.id ? (
-											<>Your Pin</>
-										) : (
-											findAuthor(pinDetail)?.name +
-											"'s Pin"
-										)}
-									</span>
-								</div>
-								{pinDetail?.authorId === currentUser?.id && (
-									<img
-										src="/icons/trash-2.svg"
-										alt=""
-										onClick={() =>
-											setModal((prev) => ({
-												...prev,
-												type: "pin",
-												isActive: true,
-												function: () =>
-													deletePin(pinDetail.id),
-											}))
-										}
-									/>
-								)}
+										</TransformComponent>
+									);
+								}}
+							</TransformWrapper>
+							<div className="notifications">
+								{notifications.map((notification) => (
+									<div
+										className="notification"
+										key={notification.id}
+									>
+										{notification.message}
+									</div>
+								))}
 							</div>
-							<div className="chat">
-								<div
-									className={"comment-card"}
-									style={{
-										backgroundColor:
-											findAuthor(pinDetail)?.color,
-										color: getContrastColor(
-											findAuthor(pinDetail)?.color,
-										),
-									}}
-								>
-									<span>
-										{inputMode.mode === "create" &&
-										inputMode.to === "comment"
-											? comment
-											: pinDetail?.comment}
-									</span>
-
+							<div
+								className={
+									pinDetail
+										? "pin-details active"
+										: "pin-details"
+								}
+							>
+								<div className="title">
+									<div className="items">
+										<img
+											src="/icons/x.svg"
+											alt=""
+											className="close"
+											onClick={() => {
+												setPinDetail(null);
+												handleClose();
+											}}
+										/>
+										<span>
+											{pinDetail?.authorId ===
+											currentUser?.id ? (
+												<>Your Pin</>
+											) : (
+												findAuthor(pinDetail)?.name +
+												"'s Pin"
+											)}
+										</span>
+									</div>
 									{pinDetail?.authorId ===
 										currentUser?.id && (
 										<img
-											src="/icons/edit-3.svg"
+											src="/icons/trash-2.svg"
 											alt=""
-											onClick={() => {
-												setInputMode((prev) => ({
+											onClick={() =>
+												setModal((prev) => ({
 													...prev,
-													mode: "edit",
-													to: "comment",
-												}));
-												setReply(pinDetail.comment);
-											}}
+													type: "pin",
+													isActive: true,
+													function: () =>
+														deletePin(pinDetail.id),
+												}))
+											}
 										/>
 									)}
 								</div>
-								{repliesLoading ? (
-									<span className="text-center mt-2">
-										Loading replies...
-									</span>
-								) : (
-									<div className="replies mt-2">
-										{replies.length === 0 ? (
-											<span className="text-center">
-												No replies found
-											</span>
-										) : (
-											<>
-												{replies.map((reply) => (
-													<div
-														className={
-															"comment-card reply"
-														}
-														key={reply.id}
-													>
-														{reply.text}
-														<div className="items">
-															<div
-																className="marker"
-																style={{
-																	backgroundColor:
-																		findAuthor(
-																			reply.author_id,
-																		)
-																			?.color,
-																}}
-															></div>
-															<div className="username">
-																{
-																	findAuthor(
-																		reply.author_id,
-																	)?.name
-																}
-															</div>
+								<div className="chat">
+									<div
+										className={"comment-card"}
+										style={{
+											backgroundColor:
+												findAuthor(pinDetail)?.color,
+											color: getContrastColor(
+												findAuthor(pinDetail)?.color,
+											),
+										}}
+									>
+										<span>
+											{inputMode.mode === "create" &&
+											inputMode.to === "comment"
+												? comment
+												: pinDetail?.comment}
+										</span>
 
-															<div className="time">
-																{formatTime(
-																	reply.created_at,
-																)}
-															</div>
-															{reply.author_id ===
-																currentUser?.id && (
-																<>
-																	<div
-																		className="edit"
-																		onClick={() => {
-																			setInputMode(
-																				(
-																					prev,
-																				) => ({
-																					...prev,
-																					mode: "edit",
-																					to: "reply",
-																					idToEdit:
-																						reply.id,
-																				}),
-																			);
-																			setReply(
-																				reply.text,
-																			);
-																		}}
-																	>
-																		Edit
-																	</div>
-																	<img
-																		src="/icons/trash-2.svg"
-																		alt=""
-																		className="delete-reply"
-																		onClick={() =>
-																			deleteReply(
-																				reply.id,
-																			)
-																		}
-																	/>
-																</>
-															)}
-														</div>
-													</div>
-												))}
-											</>
+										{pinDetail?.authorId ===
+											currentUser?.id && (
+											<img
+												src="/icons/edit-3.svg"
+												alt=""
+												onClick={() => {
+													setInputMode((prev) => ({
+														...prev,
+														mode: "edit",
+														to: "comment",
+													}));
+													setReply(pinDetail.comment);
+												}}
+											/>
 										)}
 									</div>
-								)}
-							</div>
-							<div className="disclaimer">
-								Enter to send Esc to cancel
-							</div>
+									{repliesLoading ? (
+										<span className="text-center mt-2">
+											Loading replies...
+										</span>
+									) : (
+										<div className="replies mt-2">
+											{replies.length === 0 ? (
+												<span className="text-center">
+													No replies found
+												</span>
+											) : (
+												<>
+													{replies.map((reply) => (
+														<div
+															className={
+																"comment-card reply"
+															}
+															key={reply.id}
+														>
+															{reply.text}
+															<div className="items">
+																<div
+																	className="marker"
+																	style={{
+																		backgroundColor:
+																			findAuthor(
+																				reply.author_id,
+																			)
+																				?.color,
+																	}}
+																></div>
+																<div className="username">
+																	{
+																		findAuthor(
+																			reply.author_id,
+																		)?.name
+																	}
+																</div>
 
-							<div className="input">
-								<input
-									type="text"
-									className="form-control"
-									ref={commentRef}
-									placeholder={
-										inputMode.mode === "create" &&
-										inputMode.to === "comment"
-											? "Enter your comment"
-											: "Enter your reply"
-									}
-									value={
-										inputMode.mode === "create" &&
-										inputMode.to === "comment"
-											? comment
-											: reply
-									}
-									onChange={(e) => {
-										inputMode.mode === "create" &&
-										inputMode.to === "comment"
-											? setComment(e.target.value)
-											: setReply(e.target.value);
-									}}
-									onKeyDown={(e) => {
-										if (
-											e.key === "Enter" &&
-											inputMode.mode === "create" &&
-											inputMode.to === "reply"
-										) {
-											addReply(pinDetail);
-										} else if (
-											e.key === "Enter" &&
+																<div className="time">
+																	{formatTime(
+																		reply.created_at,
+																	)}
+																</div>
+																{reply.author_id ===
+																	currentUser?.id && (
+																	<>
+																		<div
+																			className="edit"
+																			onClick={() => {
+																				setInputMode(
+																					(
+																						prev,
+																					) => ({
+																						...prev,
+																						mode: "edit",
+																						to: "reply",
+																						idToEdit:
+																							reply.id,
+																					}),
+																				);
+																				setReply(
+																					reply.text,
+																				);
+																			}}
+																		>
+																			Edit
+																		</div>
+																		<img
+																			src="/icons/trash-2.svg"
+																			alt=""
+																			className="delete-reply"
+																			onClick={() =>
+																				deleteReply(
+																					reply.id,
+																				)
+																			}
+																		/>
+																	</>
+																)}
+															</div>
+														</div>
+													))}
+												</>
+											)}
+										</div>
+									)}
+								</div>
+								<div className="disclaimer">
+									Enter to send Esc to cancel
+								</div>
+
+								<div className="input">
+									<input
+										type="text"
+										className="form-control"
+										ref={commentRef}
+										placeholder={
 											inputMode.mode === "create" &&
 											inputMode.to === "comment"
-										) {
-											addComment(pinDetail.id);
-										} else if (
-											e.key === "Enter" &&
-											inputMode.mode === "edit" &&
+												? "Enter your comment"
+												: "Enter your reply"
+										}
+										value={
+											inputMode.mode === "create" &&
 											inputMode.to === "comment"
-										) {
-											editComment(pinDetail.id);
-										} else if (
-											e.key === "Enter" &&
-											inputMode.mode === "edit" &&
-											inputMode.to === "reply"
-										) {
-											editReply(inputMode.idToEdit);
-										} else if (e.key === "Escape") {
-											setPinDetail(null);
+												? comment
+												: reply
+										}
+										onChange={(e) => {
+											inputMode.mode === "create" &&
+											inputMode.to === "comment"
+												? setComment(e.target.value)
+												: setReply(e.target.value);
+										}}
+										onKeyDown={(e) => {
 											if (
+												e.key === "Enter" &&
+												inputMode.mode === "create" &&
+												inputMode.to === "reply"
+											) {
+												addReply(pinDetail);
+											} else if (
+												e.key === "Enter" &&
 												inputMode.mode === "create" &&
 												inputMode.to === "comment"
 											) {
-												handleClose();
+												addComment(pinDetail.id);
+											} else if (
+												e.key === "Enter" &&
+												inputMode.mode === "edit" &&
+												inputMode.to === "comment"
+											) {
+												editComment(pinDetail.id);
+											} else if (
+												e.key === "Enter" &&
+												inputMode.mode === "edit" &&
+												inputMode.to === "reply"
+											) {
+												editReply(inputMode.idToEdit);
+											} else if (e.key === "Escape") {
+												setPinDetail(null);
+												if (
+													inputMode.mode ===
+														"create" &&
+													inputMode.to === "comment"
+												) {
+													handleClose();
+												}
 											}
-										}
-									}}
-								/>
+										}}
+									/>
+								</div>
 							</div>
-						</div>
-						<ShareModal
-							roomInfo={roomInfo}
-							currentUser={currentUser}
-							shareModalActive={shareModalActive}
-							setShareModalActive={setShareModalActive}
-							activeUsers={activeUsers}
-							delay={delay}
-						/>
-						<ConfirmationModal modal={modal} setModal={setModal} />
-					</>
-				)}
+						</>
+					)}
+				</div>
+				<ShareModal
+					roomInfo={roomInfo}
+					currentUser={currentUser}
+					shareModalActive={shareModalActive}
+					setShareModalActive={setShareModalActive}
+					activeUsers={activeUsers}
+					delay={delay}
+				/>
+				<ConfirmationModal modal={modal} setModal={setModal} />
 			</div>
-		</div>
+		</>
 	);
 }
