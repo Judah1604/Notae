@@ -1,4 +1,4 @@
-import { EB_Garamond, Geist, Inter } from "next/font/google";
+import { EB_Garamond, Geist } from "next/font/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
@@ -7,10 +7,7 @@ const geistSans = Geist({
 	variable: "--font-geist-sans",
 	subsets: ["latin"],
 });
-const inter = Inter({
-	variable: "--font-inter",
-	subsets: ["latin"],
-});
+
 const eb_garamond = EB_Garamond({
 	variable: "--font-eb_garamond",
 	subsets: ["latin"],
@@ -26,7 +23,7 @@ export default function RootLayout({ children }) {
 	return (
 		<html
 			lang="en"
-			className={`${geistSans.variable} ${inter.variable} ${eb_garamond.variable}`}
+			className={`${geistSans.variable} ${eb_garamond.variable}`}
 		>
 			<body>
 				{children} <Analytics />

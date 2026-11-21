@@ -56,7 +56,6 @@ h1,
 h2,
 h3 {
 	letter-spacing: -2px;
-	font-family: var(--font-inter);
 }
 
 input,
