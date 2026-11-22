@@ -224,7 +224,6 @@ src/
     color.js              # fixed-saturation, random-hue colour generator
     timeAgo.js
   styles/
-proxy.js                  # session refresh
 ```
 
 ## Known limitations

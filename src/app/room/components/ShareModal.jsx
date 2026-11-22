@@ -10,7 +10,7 @@ function ShareModal({
     delay
 }) {
 	const [isCopying, setIsCopying] = useState(false);
-	const currentUrl = window.location.href;
+	const currentUrl = window?.location.href;
 	
 
 	async function copyLink() {

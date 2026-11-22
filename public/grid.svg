@@ -1,9 +1,14 @@
 <svg width="1504" height="1059" viewBox="0 0 1504 1059" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<rect width="1504" height="1059" fill="url(#pattern0_1488_13)" fill-opacity="0.05"/>
+<rect width="1504" height="1059" fill="url(#pattern0_1555_5)" fill-opacity="0.1"/>
+<rect width="1504" height="1059" fill="url(#pattern1_1555_5)"/>
 <defs>
-<pattern id="pattern0_1488_13" patternUnits="userSpaceOnUse" patternTransform="matrix(120 0 0 120 692 469.5)" preserveAspectRatio="none" viewBox="0 0 200 200" width="1" height="1">
-<g id="pattern0_1488_13_inner">
-<path d="M0.5 0.5H199.5V199.5H0.5V0.5Z" fill="none" stroke="white"/>
+<pattern id="pattern0_1555_5" patternUnits="userSpaceOnUse" patternTransform="matrix(200 0 0 200 652 429.5)" preserveAspectRatio="none" viewBox="0 0 100 100" width="1" height="1">
+<g id="pattern0_1555_5_inner">
+<rect x="0.1" y="0.1" width="99.8" height="99.8" fill="none" stroke-width="0.2" stroke="white"/>
+</g>
+</pattern><pattern id="pattern1_1555_5" patternUnits="userSpaceOnUse" patternTransform="matrix(40 0 0 40 732 509.5)" preserveAspectRatio="none" viewBox="0 0 100 100" width="1" height="1">
+<g id="pattern1_1555_5_inner">
+<rect x="0.1" y="0.1" width="99.8" height="99.8" fill="none" stroke-width="0.2" stroke="white"/>
 </g>
 </pattern></defs>
 </svg>

@@ -451,7 +451,7 @@ export default function RoomClient({ room_id }) {
 
 	async function handleImageClick(e) {
 		setShowPins(true);
-        setReplies([])
+		setReplies([]);
 		if (pinDetail) return;
 
 		setInputMode((prev) => ({ ...prev, mode: "create", to: "comment" }));
@@ -774,9 +774,7 @@ export default function RoomClient({ room_id }) {
 							</button>
 						</div>
 					</div>
-					<div className="disclaimer">
-						Pinch and pan to navigate canvas.
-					</div>
+
 					{isLoading ? (
 						<p className="text-center mt-3">
 							Loading room information...
@@ -785,7 +783,7 @@ export default function RoomClient({ room_id }) {
 						<p>Unable to load your room membership.</p>
 					) : (
 						<>
-							<TransformWrapper>
+							<TransformWrapper minScale={0.7}>
 								{({ zoomToElement }) => {
 									zoomRef.current = zoomToElement;
 
@@ -908,6 +906,9 @@ export default function RoomClient({ room_id }) {
 									);
 								}}
 							</TransformWrapper>
+							<div className="disclaimer">
+								Pinch and pan to navigate canvas.
+							</div>
 							<div className="notifications">
 								{notifications.map((notification) => (
 									<div
