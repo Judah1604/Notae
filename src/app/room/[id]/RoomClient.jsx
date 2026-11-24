@@ -783,13 +783,13 @@ export default function RoomClient({ room_id }) {
 						<p>Unable to load your room membership.</p>
 					) : (
 						<>
-							<TransformWrapper minScale={0.7}>
+							<TransformWrapper minScale={0.7} centerOnInit>
 								{({ zoomToElement }) => {
 									zoomRef.current = zoomToElement;
 
 									return (
 										<TransformComponent>
-											<div className="preview">
+											<div className="canvas">
 												<div
 													className="image-wrapper"
 													onClick={handleImageClick}
@@ -906,6 +906,7 @@ export default function RoomClient({ room_id }) {
 									);
 								}}
 							</TransformWrapper>
+
 							<div className="disclaimer">
 								Pinch and pan to navigate canvas.
 							</div>
