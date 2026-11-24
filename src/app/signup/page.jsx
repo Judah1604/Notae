@@ -46,6 +46,13 @@ function Page() {
 					<label htmlFor="name">Display name</label>
 					<input
 						type="text"
+						autoComplete="off"
+						autoCorrect="on"
+						autoCapitalize="sentences"
+						spellCheck
+						enterKeyHint="send"
+						data-lpignore="true"
+						data-1p-ignore
 						id="name"
 						name="username"
 						className="form-control"

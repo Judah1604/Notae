@@ -1094,6 +1094,13 @@ export default function RoomClient({ room_id }) {
 								<div className="input">
 									<input
 										type="text"
+										autoComplete="off"
+										autoCorrect="on"
+										autoCapitalize="sentences"
+										spellCheck
+										enterKeyHint="send"
+										data-lpignore="true"
+										data-1p-ignore
 										className="form-control"
 										ref={commentRef}
 										placeholder={

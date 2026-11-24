@@ -225,6 +225,13 @@ function page() {
 							<label htmlFor="roomname">Room name</label>
 							<input
 								type="text"
+								autoComplete="off"
+								autoCorrect="on"
+								autoCapitalize="sentences"
+								spellCheck
+								enterKeyHint="send"
+								data-lpignore="true"
+								data-1p-ignore
 								id="roomname"
 								name="roomname"
 								className="form-control"
